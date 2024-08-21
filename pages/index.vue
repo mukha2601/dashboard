@@ -1,16 +1,14 @@
 <script setup>
-// import { ref, reactive, onMounted, computed } from "vue";
-const router = useRouter();
-
 const people = ref([]);
-const isOpen = ref(false);
+const addModal = ref(false);
+const editModal = ref(false);
 const selectedId = ref(null);
-const isEditing = ref(false);
 
 const formState = reactive({
   name: "",
   title: "",
-  images: null,
+  images: null, // yangi surat
+  oldImage: null, // eski surat
 });
 
 function handleFileChange(event) {
@@ -23,7 +21,7 @@ function submitCategory() {
   formData.append("name_en", formState.name);
   formData.append("name_ru", formState.title);
 
-  console.log(formState);  
+  console.log(formState);
 
   if (formState.images) {
     formData.append("images", formState.images);
@@ -53,7 +51,7 @@ function submitCategory() {
       });
 
       // Modalni yopish
-      isOpen.value = false;
+      addModal.value = false;
 
       // Formani tozalash
       formState.name = "";
@@ -65,24 +63,36 @@ function submitCategory() {
     });
 }
 
-
 function editCategory() {
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
-  formData.append("name_en", formState.name);
-  formData.append("name_ru", formState.title);
 
+  formData.append(
+    "name_en",
+    formState.name || people.value.find((p) => p.id === selectedId.value).name
+  );
+  formData.append(
+    "name_ru",
+    formState.title || people.value.find((p) => p.id === selectedId.value).title
+  );
+
+  // Agar yangi rasm tanlangan bo'lsa, uni formData'ga qo'shing, aks holda eski rasmni oling
   if (formState.images) {
-    formData.append("images", formState.images);
+    formData.append("images", formState.images); // yangi surat
+  } else {
+    formData.append("image_src", formState.oldImage); // eski suratni yuborish
   }
 
-  fetch(`https://autoapi.dezinfeksiyatashkent.uz/api/categories/${selectedId.value}`, {
-    method: "PUT",
-    body: formData,
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
+  fetch(
+    `https://autoapi.dezinfeksiyatashkent.uz/api/categories/${selectedId.value}`,
+    {
+      method: "PUT",
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -92,18 +102,22 @@ function editCategory() {
     .then((data) => {
       // Ma'lumotni yangilash
       const updatedItem = people.value.find((p) => p.id === selectedId.value);
-      updatedItem.name = data.name_en;
-      updatedItem.title = data.name_ru;
-      updatedItem.image = `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data.image_src}`;
+      updatedItem.name = data?.data.name_en;
+      updatedItem.title = data?.data.name_ru;
+      updatedItem.image = `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data?.data.image_src}`;
 
-      isOpen.value = false;
-      isEditing.value = false;
+      editModal.value = false; // Modalni yopish
+
+      // Formani tozalash
+      formState.name = "";
+      formState.title = "";
+      formState.images = null;
+      formState.oldImage = null;
     })
     .catch((error) => {
       console.error("Error:", error);
     });
 }
-
 
 onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/categories")
@@ -146,9 +160,10 @@ const items = (row) => [
       click: () => {
         formState.name = row.name;
         formState.title = row.title;
-        formState.images = row.image; // Agar kerak bo'lsa
+        formState.images = null; // yangi fayl tanlanmagan bo'lsa bo'sh qoldiriladi
+        formState.oldImage = row.image; // eski suratni saqlaymiz
         selectedId.value = row.id; // Tahrirlanayotgan qatorning ID'sini saqlash
-        isEditing.value = true; // Tahrirlash rejimini o'rnatish
+        editModal.value = true; // Tahrirlash rejimini o'rnatish
       },
     },
     {
@@ -187,7 +202,7 @@ const rows = computed(() => {
 <template>
   <div>
     <!-- ------------------------------ Add Modal ------------------------------------ -->
-    <UModal v-model="isOpen" prevent-close>
+    <UModal v-model="addModal" prevent-close>
       <UCard
         :ui="{
           ring: '',
@@ -202,7 +217,7 @@ const rows = computed(() => {
               variant="ghost"
               icon="i-heroicons-x-mark-20-solid"
               class="-my-1"
-              @click="isOpen = false"
+              @click="addModal = false"
             />
           </div>
         </template>
@@ -233,7 +248,7 @@ const rows = computed(() => {
     <!-- ------------------------------ Add Modal End ------------------------------------ -->
 
     <!-- ------------------------------ Edit Modal ------------------------------------ -->
-    <UModal v-model="isEditing" prevent-close>
+    <UModal v-model="editModal" prevent-close>
       <UCard
         :ui="{
           ring: '',
@@ -242,13 +257,13 @@ const rows = computed(() => {
       >
         <template #header>
           <div class="flex items-center justify-between">
-            Add new items to the database
+            Edit Category
             <UButton
               color="gray"
               variant="ghost"
               icon="i-heroicons-x-mark-20-solid"
               class="-my-1"
-              @click="isEditing = false"
+              @click="editModal = false"
             />
           </div>
         </template>
@@ -271,40 +286,42 @@ const rows = computed(() => {
             accept="image/*"
           />
           <div>
-            <UButton type="submit">Add</UButton>
+            <UButton type="submit">Update</UButton>
           </div>
         </UForm>
       </UCard>
     </UModal>
+
     <!-- ------------------------------ Edit Modal End ------------------------------------ -->
     <div
       class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700"
     >
-      <UButton label="Add categories" class="me-4" @click="isOpen = true" />
+      <UButton label="Add categories" class="me-4" @click="addModal = true" />
       <UPagination
         v-model="page"
         :page-count="pageCount"
         :total="people.length"
       />
     </div>
-
-    <UTable :rows="rows" :columns="columns" class="overflow-y-hidden">
-      <template #image-data="{ row }">
-        <img
-          :src="row.image"
-          alt="Category Image"
-          class="h-24 w-40 object-cover"
-        />
-      </template>
-      <template #actions-data="{ row }">
-        <UDropdown :items="items(row)">
-          <UButton
-            color="gray"
-            variant="ghost"
-            icon="i-heroicons-ellipsis-horizontal-20-solid"
+    <div class="h-[600px] overflow-y-scroll">
+      <UTable :rows="rows" :columns="columns" class="overflow-y-hidden">
+        <template #image-data="{ row }">
+          <img
+            :src="row.image"
+            alt="Category Image"
+            class="h-24 w-40 object-cover"
           />
-        </UDropdown>
-      </template>
-    </UTable>
+        </template>
+        <template #actions-data="{ row }">
+          <UDropdown :items="items(row)">
+            <UButton
+              color="gray"
+              variant="ghost"
+              icon="i-heroicons-ellipsis-horizontal-20-solid"
+            />
+          </UDropdown>
+        </template>
+      </UTable>
+    </div>
   </div>
 </template>
