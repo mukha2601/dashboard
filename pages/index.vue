@@ -3,8 +3,9 @@
 const router = useRouter();
 
 const people = ref([]);
-
 const isOpen = ref(false);
+const selectedId = ref(null);
+const isEditing = ref(false);
 
 const formState = reactive({
   name: "",
@@ -12,12 +13,7 @@ const formState = reactive({
   images: null,
 });
 
-// const name = ref("");
-// const title = ref("");
-// const images = ref(null);
-
 function handleFileChange(event) {
-  // images.value = event;
   formState.images = event;
 }
 
@@ -26,6 +22,8 @@ function submitCategory() {
   const formData = new FormData();
   formData.append("name_en", formState.name);
   formData.append("name_ru", formState.title);
+
+  console.log(formState);  
 
   if (formState.images) {
     formData.append("images", formState.images);
@@ -48,7 +46,7 @@ function submitCategory() {
       console.log("Success:", data);
       // Yangi kategoriya qo'shilgandan keyin ma'lumotlar yangilanadi
       people.value.push({
-        id: data.data.id, 
+        id: data.data.id,
         name: data.data.name_en,
         title: data.data.name_ru,
         image: `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data.data.image_src}`,
@@ -64,8 +62,48 @@ function submitCategory() {
     })
     .catch((error) => {
       console.error("Error:", error);
-    })
+    });
 }
+
+
+function editCategory() {
+  const token = localStorage.getItem("accessToken");
+  const formData = new FormData();
+  formData.append("name_en", formState.name);
+  formData.append("name_ru", formState.title);
+
+  if (formState.images) {
+    formData.append("images", formState.images);
+  }
+
+  fetch(`https://autoapi.dezinfeksiyatashkent.uz/api/categories/${selectedId.value}`, {
+    method: "PUT",
+    body: formData,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      // Ma'lumotni yangilash
+      const updatedItem = people.value.find((p) => p.id === selectedId.value);
+      updatedItem.name = data.name_en;
+      updatedItem.title = data.name_ru;
+      updatedItem.image = `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data.image_src}`;
+
+      isOpen.value = false;
+      isEditing.value = false;
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+
 
 onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/categories")
@@ -105,7 +143,13 @@ const items = (row) => [
     {
       label: "Edit",
       icon: "i-heroicons-pencil-square-20-solid",
-      click: () => console.log("Edit", row.id),
+      click: () => {
+        formState.name = row.name;
+        formState.title = row.title;
+        formState.images = row.image; // Agar kerak bo'lsa
+        selectedId.value = row.id; // Tahrirlanayotgan qatorning ID'sini saqlash
+        isEditing.value = true; // Tahrirlash rejimini o'rnatish
+      },
     },
     {
       label: "Delete",
@@ -142,6 +186,7 @@ const rows = computed(() => {
 
 <template>
   <div>
+    <!-- ------------------------------ Add Modal ------------------------------------ -->
     <UModal v-model="isOpen" prevent-close>
       <UCard
         :ui="{
@@ -151,11 +196,7 @@ const rows = computed(() => {
       >
         <template #header>
           <div class="flex items-center justify-between">
-            <h3
-              class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
-            >
-              Modal
-            </h3>
+            Add new items to the database
             <UButton
               color="gray"
               variant="ghost"
@@ -165,7 +206,6 @@ const rows = computed(() => {
             />
           </div>
         </template>
-        <h1>Add new items to the database</h1>
         <UForm
           :state="formState"
           @submit.prevent="submitCategory"
@@ -185,11 +225,68 @@ const rows = computed(() => {
             accept="image/*"
           />
           <div>
-            <UButton type="submit" >Add</UButton>
+            <UButton type="submit">Add</UButton>
           </div>
         </UForm>
       </UCard>
     </UModal>
+    <!-- ------------------------------ Add Modal End ------------------------------------ -->
+
+    <!-- ------------------------------ Edit Modal ------------------------------------ -->
+    <UModal v-model="isEditing" prevent-close>
+      <UCard
+        :ui="{
+          ring: '',
+          divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+        }"
+      >
+        <template #header>
+          <div class="flex items-center justify-between">
+            Add new items to the database
+            <UButton
+              color="gray"
+              variant="ghost"
+              icon="i-heroicons-x-mark-20-solid"
+              class="-my-1"
+              @click="isEditing = false"
+            />
+          </div>
+        </template>
+        <UForm
+          :state="formState"
+          @submit.prevent="editCategory"
+          class="py-4 flex flex-col gap-4"
+        >
+          <UFormGroup label="Name" name="name">
+            <UInput v-model="formState.name" autocomplete="off" />
+          </UFormGroup>
+          <UFormGroup label="Title" name="title">
+            <UInput v-model="formState.title" autocomplete="off" />
+          </UFormGroup>
+          <UInput
+            @input="handleFileChange($event.target.files[0])"
+            type="file"
+            size="sm"
+            icon="i-heroicons-folder"
+            accept="image/*"
+          />
+          <div>
+            <UButton type="submit">Add</UButton>
+          </div>
+        </UForm>
+      </UCard>
+    </UModal>
+    <!-- ------------------------------ Edit Modal End ------------------------------------ -->
+    <div
+      class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700"
+    >
+      <UButton label="Add categories" class="me-4" @click="isOpen = true" />
+      <UPagination
+        v-model="page"
+        :page-count="pageCount"
+        :total="people.length"
+      />
+    </div>
 
     <UTable :rows="rows" :columns="columns" class="overflow-y-hidden">
       <template #image-data="{ row }">
@@ -209,16 +306,5 @@ const rows = computed(() => {
         </UDropdown>
       </template>
     </UTable>
-
-    <div
-      class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700"
-    >
-      <UButton label="Add categories" class="me-4" @click="isOpen = true" />
-      <UPagination
-        v-model="page"
-        :page-count="pageCount"
-        :total="people.length"
-      />
-    </div>
   </div>
 </template>
