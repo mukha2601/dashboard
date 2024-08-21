@@ -14,18 +14,18 @@
 const route = useRoute();
 
 const links = [
-  {
-    label: "Dashboard",
-    icon: "material-symbols:home",
-    to: "/",
-  },
+  // {
+  //   label: "Dashboard",
+  //   icon: "material-symbols:home",
+  //   to: "/",
+  // },
   {
     label: "Settings",
     icon: "material-symbols:settings",
     // to: `${
     //   route.path.startsWith("/dev") ? "/dev" : ""
     // }/components/vertical-navigation`,
-    to: "/settings",
+    to: "/",
   },
   {
     label: "Brands",
