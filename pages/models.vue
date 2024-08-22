@@ -6,25 +6,70 @@ const selectedId = ref(null);
 const brands = ref([]);
 
 function editModalFunc() {
-  editModal.value = false;
+  const editModal = ref(false);
+  formState.name = "";
 }
 
+// inputga kiritilgan ma'lumotlarni saqlab turish uchun
 const formState = reactive({
   name: "",
-  brand: "",
+  brand_id: "",
 });
 
-function handleFileChange(event) {
-  formState.images = event;
-}
+// function submitModel() {
+//   // Modalni yopish
+//   addModal.value = false;
 
-function submitCategory() {
+//   const token = localStorage.getItem("accessToken");
+//   const formData = new FormData();
+//   formData.append("name", formState.name);
+//   formData.append("brand_id", formState.brand_id);
+
+//   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/brands", {
+//     method: "POST",
+//     body: formData,
+//     headers: {
+//       Authorization: `Bearer ${token}`,
+//     },
+//   })
+//     .then((response) => {
+//       if (!response.ok) {
+//         throw new Error("Network response was not ok");
+//       }
+//       return response.json();
+//     })
+//     .then((data) => {
+//       console.log(data);
+
+//       // Yangi kategoriya qo'shilgandan keyin ma'lumotlar yangilanadi
+//       rowItem.value.push({
+//         id: data.id,
+//         name: data.name,
+//         brand: data.brand_title,
+//       });
+
+//       // Formani tozalash
+//       formState.name = "";
+//       formState.brand_id = "";
+//     })
+//     .catch((error) => {
+//       console.error("Error:", error);
+//     });
+// }
+function submitModel() {
+  // Konsol orqali formState va formData'ni tekshiramiz
+  console.log("formState:", formState);
+
+  // Modalni yopish
+  addModal.value = false;
+
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
   formData.append("name", formState.name);
-  formData.append("brand", formState.name);
+  formData.append("brand_id", formState.brand_id); // brand_id to'g'ri ID bo'lishi kerak
 
-  console.log(formState);
+  // Konsol orqali formData'ni tekshirish
+  console.log("FormData:", formData.get("name"), formData.get("brand_id"));
 
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/brands", {
     method: "POST",
@@ -40,19 +85,18 @@ function submitCategory() {
       return response.json();
     })
     .then((data) => {
-      console.log("Success:", data);
+      console.log(data);
+
       // Yangi kategoriya qo'shilgandan keyin ma'lumotlar yangilanadi
       rowItem.value.push({
-        id: data.data.id,
-        title: data.data.title,
+        id: data?.data.id,
+        name: data?.data.name,
+        brand: data?.data.brand_title,
       });
 
-      // Modalni yopish
-      addModal.value = false;
-
       // Formani tozalash
-      formState.title = "";
-      formState.images = null;
+      formState.name = "";
+      formState.brand_id = "";
     })
     .catch((error) => {
       console.error("Error:", error);
@@ -60,13 +104,13 @@ function submitCategory() {
 }
 
 function editCategory() {
+  editModal.value = false; // Modalni yopish
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
 
   formData.append(
-    "title",
-    formState.title ||
-      rowItem.value.find((p) => p.id === selectedId.value).title
+    "name",
+    formState.name || rowItem.value.find((p) => p.id === selectedId.value).name
   );
 
   fetch(
@@ -88,13 +132,10 @@ function editCategory() {
     .then((data) => {
       // Ma'lumotni yangilash
       const updatedItem = rowItem.value.find((p) => p.id === selectedId.value);
-      updatedItem.title = data?.data.title;
-      updatedItem.image = `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data?.data.image_src}`;
-
-      editModal.value = false; // Modalni yopish
+      updatedItem.name = data?.data.name;
 
       // Formani tozalash
-      formState.title = "";
+      formState.name = "";
     })
     .catch((error) => {
       console.error("Error:", error);
@@ -112,6 +153,7 @@ onMounted(() => {
           id: item.id,
           name: item.name,
           brand: item.brand_title,
+          brand_id: item.brand_title,
         });
       });
     });
@@ -119,11 +161,9 @@ onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/brands")
     .then((response) => response.json())
     .then((data) => {
-      console.log(data?.data);
-
       if (data?.data) {
         data.data.map((el) => {
-          brands.value.push(el.title); // Push each brand title to the brands array
+          brands.value.push({ id: el.id, title: el.title }); // Brend ID va title qo'shiladi
         });
       }
     })
@@ -131,8 +171,6 @@ onMounted(() => {
       console.error("Error fetching brands:", error); // Handle errors
     });
 });
-
-console.log(brands.value, "brands");
 
 const columns = [
   {
@@ -154,9 +192,7 @@ const items = (row) => [
       label: "Edit",
       icon: "i-heroicons-pencil-square-20-solid",
       click: () => {
-        formState.title = row.title;
-        formState.images = null; // yangi fayl tanlanmagan bo'lsa bo'sh qoldiriladi
-        formState.oldImage = row.image; // eski suratni saqlaymiz
+        formState.name = row.name;
         selectedId.value = row.id; // Tahrirlanayotgan qatorning ID'sini saqlash
         editModal.value = true; // Tahrirlash oynasini ochish
       },
@@ -215,17 +251,25 @@ const rows = computed(() => {
         </template>
         <UForm
           :state="formState"
-          @submit.prevent="submitCategory"
+          @submit.prevent="submitModel"
           class="py-4 flex flex-col gap-4"
         >
           <UFormGroup label="Name" name="name">
-            <UInput v-model="formState.title" required autocomplete="off" />
+            <UInput v-model="formState.name" required autocomplete="off" />
           </UFormGroup>
           <USelect
             placeholder="Brands"
-            :options="brands"
-            :model-value="formState.brand"
+            :options="
+              brands.map((brand) => ({ label: brand.title, value: brand.id }))
+            "
+            v-model="formState.brand_id"
           />
+
+          <!-- <USelect
+            placeholder="Brands"
+            :options="brands"
+            v-model="formState.brand_id"
+          /> -->
           <div>
             <UButton type="submit">Add</UButton>
           </div>
@@ -250,7 +294,7 @@ const rows = computed(() => {
               variant="ghost"
               icon="i-heroicons-x-mark-20-solid"
               class="-my-1"
-              @click="editModalFunc"
+              @click="editModal = false"
             />
           </div>
         </template>
