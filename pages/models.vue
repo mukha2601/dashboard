@@ -3,11 +3,15 @@ const rowItem = ref([]);
 const addModal = ref(false);
 const editModal = ref(false);
 const selectedId = ref(null);
+const brands = ref([]);
+
+function editModalFunc() {
+  editModal.value = false;
+}
 
 const formState = reactive({
-  title: "",
-  images: null, // yangi surat
-  oldImage: null, // eski surat
+  name: "",
+  brand: "",
 });
 
 function handleFileChange(event) {
@@ -17,13 +21,10 @@ function handleFileChange(event) {
 function submitCategory() {
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
-  formData.append("title", formState.title);
+  formData.append("name", formState.name);
+  formData.append("brand", formState.name);
 
   console.log(formState);
-
-  if (formState.images) {
-    formData.append("images", formState.images);
-  }
 
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/brands", {
     method: "POST",
@@ -44,7 +45,6 @@ function submitCategory() {
       rowItem.value.push({
         id: data.data.id,
         title: data.data.title,
-        image: `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data.data.image_src}`,
       });
 
       // Modalni yopish
@@ -65,15 +65,9 @@ function editCategory() {
 
   formData.append(
     "title",
-    formState.title || rowItem.value.find((p) => p.id === selectedId.value).title
+    formState.title ||
+      rowItem.value.find((p) => p.id === selectedId.value).title
   );
-
-  // Agar yangi rasm tanlangan bo'lsa, uni formData'ga qo'shing, aks holda eski rasmni oling
-  if (formState.images) {
-    formData.append("images", formState.images); // yangi surat
-  } else {
-    formData.append("image_src", formState.oldImage); // eski suratni yuborish
-  }
 
   fetch(
     `https://autoapi.dezinfeksiyatashkent.uz/api/brands/${selectedId.value}`,
@@ -101,8 +95,6 @@ function editCategory() {
 
       // Formani tozalash
       formState.title = "";
-      formState.images = null;
-      formState.oldImage = null;
     })
     .catch((error) => {
       console.error("Error:", error);
@@ -113,21 +105,39 @@ onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/models")
     .then((response) => response.json())
     .then((items) => {
+      console.log(items.data, "get Modales");
+
       items?.data?.map((item) => {
         rowItem.value.push({
           id: item.id,
-          title: item.name,
+          name: item.name,
+          brand: item.brand_title,
         });
       });
     });
 
-    fetch("https://autoapi.dezinfeksiyatashkent.uz/api/brands")
+  fetch("https://autoapi.dezinfeksiyatashkent.uz/api/brands")
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data?.data);
+
+      if (data?.data) {
+        data.data.map((el) => {
+          brands.value.push(el.title); // Push each brand title to the brands array
+        });
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching brands:", error); // Handle errors
+    });
 });
+
+console.log(brands.value, "brands");
 
 const columns = [
   {
-    key: "title",
-    label: "Title",
+    key: "name",
+    label: "Name",
   },
   {
     key: "brand",
@@ -208,15 +218,13 @@ const rows = computed(() => {
           @submit.prevent="submitCategory"
           class="py-4 flex flex-col gap-4"
         >
-          <UFormGroup label="Title" name="title">
+          <UFormGroup label="Name" name="name">
             <UInput v-model="formState.title" required autocomplete="off" />
           </UFormGroup>
-          <UInput
-            @input="handleFileChange($event.target.files[0])"
-            type="file"
-            size="sm"
-            icon="i-heroicons-folder"
-            accept="image/*"
+          <USelect
+            placeholder="Brands"
+            :options="brands"
+            :model-value="formState.brand"
           />
           <div>
             <UButton type="submit">Add</UButton>
@@ -242,7 +250,7 @@ const rows = computed(() => {
               variant="ghost"
               icon="i-heroicons-x-mark-20-solid"
               class="-my-1"
-              @click="editModal = false"
+              @click="editModalFunc"
             />
           </div>
         </template>
@@ -283,13 +291,6 @@ const rows = computed(() => {
     <!-- -------------------------------- Table -------------------------------------- -->
     <div class="h-[600px] overflow-y-scroll">
       <UTable :rows="rows" :columns="columns" class="overflow-y-hidden">
-        <template #image-data="{ row }">
-          <img
-            :src="row.image"
-            alt="Category Image"
-            class="h-24 w-40 object-cover"
-          />
-        </template>
         <template #actions-data="{ row }">
           <UDropdown :items="items(row)">
             <UButton

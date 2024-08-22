@@ -11,11 +11,16 @@ const formState = reactive({
   oldImage: null, // eski surat
 });
 
+// rasmni beckendga file qilib yuborish uchun hizmat qiladi
 function handleFileChange(event) {
   formState.images = event;
 }
 
+// yangi categoriya qoshadigan funksiya
 function submitCategory() {
+  // Modalni yopish
+  addModal.value = false;
+
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
   formData.append("name_en", formState.name);
@@ -35,6 +40,8 @@ function submitCategory() {
     },
   })
     .then((response) => {
+      console.log(response.ok);
+      
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -50,9 +57,6 @@ function submitCategory() {
         image: `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data.data.image_src}`,
       });
 
-      // Modalni yopish
-      addModal.value = false;
-
       // Formani tozalash
       formState.name = "";
       formState.title = "";
@@ -62,7 +66,7 @@ function submitCategory() {
       console.error("Error:", error);
     });
 }
-
+// categoriyani taxrirlovchi funksiya
 function editCategory() {
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
@@ -119,6 +123,7 @@ function editCategory() {
     });
 }
 
+// sahifa ishga tushishidan oldin ishlaydigan funksiya
 onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/categories")
     .then((response) => response.json())
@@ -171,6 +176,7 @@ const items = (row) => [
       icon: "i-heroicons-trash-20-solid",
       click: () => {
         const token = localStorage.getItem("accessToken");
+
         fetch(
           `https://autoapi.dezinfeksiyatashkent.uz/api/categories/${row.id}`,
           {
@@ -179,10 +185,18 @@ const items = (row) => [
               Authorization: `Bearer ${token}`,
             },
           }
-        ).then(() => {
-          // O'chirilgandan keyin arraydan o'chirish
-          people.value = people.value.filter((p) => p.id !== row.id);
-        });
+        )
+          .then((response) => {
+            if (response.ok) {
+              // Agar serverdan muvaffaqiyatli o‘chirilgan bo‘lsa
+              people.value = people.value.filter((p) => p.id !== row.id);
+            } else {
+              console.error("Serverdan o‘chirishda xatolik:", response.status);
+            }
+          })
+          .catch((error) => {
+            console.error("DELETE so‘rovi bajarilmadi:", error);
+          });
       },
     },
   ],
@@ -273,10 +287,10 @@ const rows = computed(() => {
           class="py-4 flex flex-col gap-4"
         >
           <UFormGroup label="Name" name="name">
-            <UInput v-model="formState.name" autocomplete="off"/>
+            <UInput v-model="formState.name" autocomplete="off" />
           </UFormGroup>
           <UFormGroup label="Title" name="title">
-            <UInput v-model="formState.title" autocomplete="off"/>
+            <UInput v-model="formState.title" autocomplete="off" />
           </UFormGroup>
           <UInput
             @input="handleFileChange($event.target.files[0])"
