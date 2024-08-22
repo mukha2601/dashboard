@@ -163,7 +163,7 @@ const items = (row) => [
         formState.images = null; // yangi fayl tanlanmagan bo'lsa bo'sh qoldiriladi
         formState.oldImage = row.image; // eski suratni saqlaymiz
         selectedId.value = row.id; // Tahrirlanayotgan qatorning ID'sini saqlash
-        editModal.value = true; // Tahrirlash rejimini o'rnatish
+        editModal.value = true; // Tahrirlash oynasini ochish
       },
     },
     {
@@ -188,9 +188,9 @@ const items = (row) => [
   ],
 ];
 
+// sahifada 5 ta itemdan oshib ketsa keyingi sahifadagi table saqlaydi
 const page = ref(1);
 const pageCount = 5;
-
 const rows = computed(() => {
   return people.value.slice(
     (page.value - 1) * pageCount,
@@ -245,9 +245,9 @@ const rows = computed(() => {
         </UForm>
       </UCard>
     </UModal>
-    <!-- ------------------------------ Add Modal End ------------------------------------ -->
+    <!-- ------------------------------ Add Modal End -------------------------------- -->
 
-    <!-- ------------------------------ Edit Modal ------------------------------------ -->
+    <!-- ------------------------------ Edit Modal ----------------------------------- -->
     <UModal v-model="editModal" prevent-close>
       <UCard
         :ui="{
@@ -273,10 +273,10 @@ const rows = computed(() => {
           class="py-4 flex flex-col gap-4"
         >
           <UFormGroup label="Name" name="name">
-            <UInput v-model="formState.name" autocomplete="off" />
+            <UInput v-model="formState.name" autocomplete="off"/>
           </UFormGroup>
           <UFormGroup label="Title" name="title">
-            <UInput v-model="formState.title" autocomplete="off" />
+            <UInput v-model="formState.title" autocomplete="off"/>
           </UFormGroup>
           <UInput
             @input="handleFileChange($event.target.files[0])"
@@ -292,7 +292,7 @@ const rows = computed(() => {
       </UCard>
     </UModal>
 
-    <!-- ------------------------------ Edit Modal End ------------------------------------ -->
+    <!-- ------------------------------ Edit Modal End ------------------------------- -->
     <div
       class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700"
     >
