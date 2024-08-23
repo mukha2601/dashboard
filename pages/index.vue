@@ -1,4 +1,5 @@
 <script setup>
+const toast = useToast();
 const people = ref([]);
 const addModal = ref(false);
 const editModal = ref(false);
@@ -40,10 +41,16 @@ function submitCategory() {
     },
   })
     .then((response) => {
-      console.log(response.ok);
-      
+      // console.log(response.statusText);
+
       if (!response.ok) {
         throw new Error("Network response was not ok");
+      } else {
+        toast.add({
+          title: response.statusText,
+          icon: "i-heroicons-check-circle",
+          timeout: 3000,
+        });
       }
       return response.json();
     })

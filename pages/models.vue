@@ -2,7 +2,7 @@
 const rowItem = ref([]);
 const addModal = ref(false);
 const editModal = ref(false);
-const selectedId = ref(null);
+// const selectedId = ref(null);
 const brands = ref([]);
 
 function editModalFunc() {
@@ -16,50 +16,12 @@ const formState = reactive({
   brand_id: "",
 });
 
-// function submitModel() {
-//   // Modalni yopish
-//   addModal.value = false;
+function handleId(event) {
+  formState.brand_id = event;
+  
+}
 
-//   const token = localStorage.getItem("accessToken");
-//   const formData = new FormData();
-//   formData.append("name", formState.name);
-//   formData.append("brand_id", formState.brand_id);
-
-//   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/brands", {
-//     method: "POST",
-//     body: formData,
-//     headers: {
-//       Authorization: `Bearer ${token}`,
-//     },
-//   })
-//     .then((response) => {
-//       if (!response.ok) {
-//         throw new Error("Network response was not ok");
-//       }
-//       return response.json();
-//     })
-//     .then((data) => {
-//       console.log(data);
-
-//       // Yangi kategoriya qo'shilgandan keyin ma'lumotlar yangilanadi
-//       rowItem.value.push({
-//         id: data.id,
-//         name: data.name,
-//         brand: data.brand_title,
-//       });
-
-//       // Formani tozalash
-//       formState.name = "";
-//       formState.brand_id = "";
-//     })
-//     .catch((error) => {
-//       console.error("Error:", error);
-//     });
-// }
 function submitModel() {
-  // Konsol orqali formState va formData'ni tekshiramiz
-  console.log("formState:", formState);
-
   // Modalni yopish
   addModal.value = false;
 
@@ -67,9 +29,6 @@ function submitModel() {
   const formData = new FormData();
   formData.append("name", formState.name);
   formData.append("brand_id", formState.brand_id); // brand_id to'g'ri ID bo'lishi kerak
-
-  // Konsol orqali formData'ni tekshirish
-  console.log("FormData:", formData.get("name"), formData.get("brand_id"));
 
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/brands", {
     method: "POST",
@@ -146,8 +105,6 @@ onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/models")
     .then((response) => response.json())
     .then((items) => {
-      console.log(items.data, "get Modales");
-
       items?.data?.map((item) => {
         rowItem.value.push({
           id: item.id,
@@ -162,6 +119,8 @@ onMounted(() => {
     .then((response) => response.json())
     .then((data) => {
       if (data?.data) {
+        console.log(data?.data);
+        
         data.data.map((el) => {
           brands.value.push({ id: el.id, title: el.title }); // Brend ID va title qo'shiladi
         });
@@ -171,6 +130,8 @@ onMounted(() => {
       console.error("Error fetching brands:", error); // Handle errors
     });
 });
+
+console.log(brands);
 
 const columns = [
   {
@@ -263,6 +224,7 @@ const rows = computed(() => {
               brands.map((brand) => ({ label: brand.title, value: brand.id }))
             "
             v-model="formState.brand_id"
+            @input="handleId($event.target.value)"
           />
 
           <!-- <USelect
