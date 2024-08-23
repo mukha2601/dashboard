@@ -21,7 +21,6 @@ function submitCategory() {
   const formData = new FormData();
   formData.append("title", formState.title);
 
-  console.log(formState);
 
   if (formState.images) {
     formData.append("images", formState.images);
@@ -47,7 +46,6 @@ function submitCategory() {
       return response.json();
     })
     .then((data) => {
-      console.log("Success:", data);
       // Yangi kategoriya qo'shilgandan keyin ma'lumotlar yangilanadi
       people.value.push({
         id: data.data.id,

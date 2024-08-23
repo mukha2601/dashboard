@@ -2,33 +2,28 @@
 const rowItem = ref([]);
 const addModal = ref(false);
 const editModal = ref(false);
-// const selectedId = ref(null);
+const selectedId = ref(null);
 const brands = ref([]);
 
-function editModalFunc() {
-  const editModal = ref(false);
+function editModalFunc(event) {
+  editModal.value = event;
+
+  formState.brand_id = "";
   formState.name = "";
 }
 
-// inputga kiritilgan ma'lumotlarni saqlab turish uchun
 const formState = reactive({
   name: "",
   brand_id: "",
 });
 
-function handleId(event) {
-  formState.brand_id = event;
-  
-}
-
 function submitModel() {
-  // Modalni yopish
   addModal.value = false;
 
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
   formData.append("name", formState.name);
-  formData.append("brand_id", formState.brand_id); // brand_id to'g'ri ID bo'lishi kerak
+  formData.append("brand_id", formState.brand_id);
 
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/models", {
     method: "POST",
@@ -44,16 +39,14 @@ function submitModel() {
       return response.json();
     })
     .then((data) => {
-      console.log(data);
-
-      // Yangi kategoriya qo'shilgandan keyin ma'lumotlar yangilanadi
+      // Yangi modelni jadvalga qo'shish
       rowItem.value.push({
-        id: data?.data.id,
-        name: data?.data.name,
-        brand: data?.data.brand_title,
+        id: data.data.id,
+        name: data.data.name,
+        brand: brands.value.find((b) => b.id === data.data.brand_id)?.title,
       });
 
-      // Formani tozalash
+      // Forma ma'lumotlarini tozalash
       formState.name = "";
       formState.brand_id = "";
     })
@@ -63,17 +56,20 @@ function submitModel() {
 }
 
 function editCategory() {
-  editModal.value = false; // Modalni yopish
+  editModal.value = false;
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
 
+  const selectedItem = rowItem.value.find((p) => p.id === selectedId.value);
+  formData.append("name", formState.name || selectedItem.name);
   formData.append(
-    "name",
-    formState.name || rowItem.value.find((p) => p.id === selectedId.value).name
+    "brand_id",
+    formState.brand_id ||
+      brands.value.find((b) => b.title === selectedItem?.brand)?.id
   );
 
   fetch(
-    `https://autoapi.dezinfeksiyatashkent.uz/api/brands/${selectedId.value}`,
+    `https://autoapi.dezinfeksiyatashkent.uz/api/models/${selectedId.value}`,
     {
       method: "PUT",
       body: formData,
@@ -89,12 +85,14 @@ function editCategory() {
       return response.json();
     })
     .then((data) => {
-      // Ma'lumotni yangilash
       const updatedItem = rowItem.value.find((p) => p.id === selectedId.value);
       updatedItem.name = data?.data.name;
+      updatedItem.brand =
+        brands.value.find((b) => b.id === data.data.brand_id)?.title ||
+        updatedItem.brand;
 
-      // Formani tozalash
       formState.name = "";
+      formState.brand_id = "";
     })
     .catch((error) => {
       console.error("Error:", error);
@@ -109,8 +107,7 @@ onMounted(() => {
         rowItem.value.push({
           id: item.id,
           name: item.name,
-          brand: item.brand_title,
-          brand_id: item.brand_title,
+          brand: item.brand_title, // To'g'ri brendni olish
         });
       });
     });
@@ -119,19 +116,15 @@ onMounted(() => {
     .then((response) => response.json())
     .then((data) => {
       if (data?.data) {
-        console.log(data?.data);
-        
         data.data.map((el) => {
-          brands.value.push({ id: el.id, title: el.title }); // Brend ID va title qo'shiladi
+          brands.value.push({ id: el.id, title: el.title });
         });
       }
     })
     .catch((error) => {
-      console.error("Error fetching brands:", error); // Handle errors
+      console.error("Error fetching brands:", error);
     });
 });
-
-console.log(brands);
 
 const columns = [
   {
@@ -153,9 +146,13 @@ const items = (row) => [
       label: "Edit",
       icon: "i-heroicons-pencil-square-20-solid",
       click: () => {
-        formState.name = row.name;
-        selectedId.value = row.id; // Tahrirlanayotgan qatorning ID'sini saqlash
-        editModal.value = true; // Tahrirlash oynasini ochish
+        const selectedItem = rowItem.value.find(
+          (p) => p.id === selectedId.value
+        );
+        formState.name = selectedItem?.name || "";
+        formState.brand_id =
+          brands.value.find((b) => b.title === selectedItem?.brand)?.id || "";
+        editModal.value = true;
       },
     },
     {
@@ -163,13 +160,12 @@ const items = (row) => [
       icon: "i-heroicons-trash-20-solid",
       click: () => {
         const token = localStorage.getItem("accessToken");
-        fetch(`https://autoapi.dezinfeksiyatashkent.uz/api/brands/${row.id}`, {
+        fetch(`https://autoapi.dezinfeksiyatashkent.uz/api/models/${row.id}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }).then(() => {
-          // O'chirilgandan keyin arraydan o'chirish
           rowItem.value = rowItem.value.filter((p) => p.id !== row.id);
         });
       },
@@ -177,7 +173,6 @@ const items = (row) => [
   ],
 ];
 
-// sahifada 5 ta itemdan oshib ketsa keyingi sahifadagi table saqlaydi
 const page = ref(1);
 const pageCount = 10;
 const rows = computed(() => {
@@ -190,14 +185,8 @@ const rows = computed(() => {
 
 <template>
   <div>
-    <!-- ------------------------------ Add Modal ------------------------------------ -->
     <UModal v-model="addModal" prevent-close>
-      <UCard
-        :ui="{
-          ring: '',
-          divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-        }"
-      >
+      <UCard>
         <template #header>
           <div class="flex items-center justify-between">
             Add new items to the database
@@ -224,30 +213,16 @@ const rows = computed(() => {
               brands.map((brand) => ({ label: brand.title, value: brand.id }))
             "
             v-model="formState.brand_id"
-            @input="handleId($event.target.value)"
           />
-
-          <!-- <USelect
-            placeholder="Brands"
-            :options="brands"
-            v-model="formState.brand_id"
-          /> -->
           <div>
             <UButton type="submit">Add</UButton>
           </div>
         </UForm>
       </UCard>
     </UModal>
-    <!-- ------------------------------ Add Modal End -------------------------------- -->
 
-    <!-- ------------------------------ Edit Modal ----------------------------------- -->
     <UModal v-model="editModal" prevent-close>
-      <UCard
-        :ui="{
-          ring: '',
-          divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-        }"
-      >
+      <UCard>
         <template #header>
           <div class="flex items-center justify-between">
             Edit Category
@@ -256,7 +231,7 @@ const rows = computed(() => {
               variant="ghost"
               icon="i-heroicons-x-mark-20-solid"
               class="-my-1"
-              @click="editModal = false"
+              @click="editModalFunc(false)"
             />
           </div>
         </template>
@@ -266,14 +241,14 @@ const rows = computed(() => {
           class="py-4 flex flex-col gap-4"
         >
           <UFormGroup label="Title" name="title">
-            <UInput v-model="formState.title" autocomplete="off" />
+            <UInput v-model="formState.name" autocomplete="off" />
           </UFormGroup>
-          <UInput
-            @input="handleFileChange($event.target.files[0])"
-            type="file"
-            size="sm"
-            icon="i-heroicons-folder"
-            accept="image/*"
+          <USelect
+            placeholder="Brands"
+            :options="
+              brands.map((brand) => ({ label: brand.title, value: brand.id }))
+            "
+            v-model="formState.brand_id"
           />
           <div>
             <UButton type="submit">Update</UButton>
@@ -282,7 +257,6 @@ const rows = computed(() => {
       </UCard>
     </UModal>
 
-    <!-- ------------------------------ Edit Modal End ------------------------------- -->
     <div
       class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700"
     >
@@ -294,7 +268,6 @@ const rows = computed(() => {
       />
     </div>
 
-    <!-- -------------------------------- Table -------------------------------------- -->
     <div class="h-[600px] overflow-y-scroll">
       <UTable :rows="rows" :columns="columns" class="overflow-y-hidden">
         <template #actions-data="{ row }">
