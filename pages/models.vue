@@ -30,7 +30,7 @@ function submitModel() {
   formData.append("name", formState.name);
   formData.append("brand_id", formState.brand_id); // brand_id to'g'ri ID bo'lishi kerak
 
-  fetch("https://autoapi.dezinfeksiyatashkent.uz/api/brands", {
+  fetch("https://autoapi.dezinfeksiyatashkent.uz/api/models", {
     method: "POST",
     body: formData,
     headers: {
@@ -179,7 +179,7 @@ const items = (row) => [
 
 // sahifada 5 ta itemdan oshib ketsa keyingi sahifadagi table saqlaydi
 const page = ref(1);
-const pageCount = 5;
+const pageCount = 10;
 const rows = computed(() => {
   return rowItem.value.slice(
     (page.value - 1) * pageCount,

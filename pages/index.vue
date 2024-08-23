@@ -5,6 +5,12 @@ const addModal = ref(false);
 const editModal = ref(false);
 const selectedId = ref(null);
 
+function editModalFunc(event) {
+  editModal.value = event;
+  formState.name = "";
+  formState.title = "";
+}
+
 const formState = reactive({
   name: "",
   title: "",
@@ -284,7 +290,7 @@ const rows = computed(() => {
               variant="ghost"
               icon="i-heroicons-x-mark-20-solid"
               class="-my-1"
-              @click="editModal = false"
+              @click="editModalFunc(false)"
             />
           </div>
         </template>
