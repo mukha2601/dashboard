@@ -14,17 +14,18 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 const route = useRoute();
 
+watch(() => route.fullPath,(newPath) => {
+    localStorage.setItem("lastPage", newPath);
+  }
+);
+
 onMounted(() => {
   const token = localStorage.getItem("accessToken");
   const lastPage = localStorage.getItem("lastPage");
-  if (lastPage && route.fullPath !== lastPage) {
-    router.push(lastPage);
-  }
 
   if (token?.includes("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey")) {
     // Agar token mavjud bo'lsa, home sahifada qoladi yoki boshqa sahifaga yo'naltiradi
-    // router.push("/");
-    localStorage.setItem('lastPage', newPath);
+    router.push(lastPage);
   } else {
     // Agar token mavjud bo'lmasa, login sahifasiga yo'naltiradi
     router.push("/login");
