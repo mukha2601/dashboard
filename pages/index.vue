@@ -33,8 +33,6 @@ function submitCategory() {
   formData.append("name_en", formState.name);
   formData.append("name_ru", formState.title);
 
-  console.log(formState);
-
   if (formState.images) {
     formData.append("images", formState.images);
   }
@@ -47,8 +45,6 @@ function submitCategory() {
     },
   })
     .then((response) => {
-      // console.log(response.statusText);
-
       if (!response.ok) {
         throw new Error("Network response was not ok");
       } else {
@@ -61,7 +57,6 @@ function submitCategory() {
       return response.json();
     })
     .then((data) => {
-      console.log("Success:", data);
       // Yangi kategoriya qo'shilgandan keyin ma'lumotlar yangilanadi
       people.value.push({
         id: data.data.id,
@@ -81,6 +76,7 @@ function submitCategory() {
 }
 // categoriyani taxrirlovchi funksiya
 function editCategory() {
+  editModal.value = false; // Modalni yopish
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
 
@@ -113,6 +109,12 @@ function editCategory() {
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
+      } else {
+        toast.add({
+          title: "Edited",
+          icon: "i-heroicons-check-circle",
+          timeout: 3000,
+        });
       }
       return response.json();
     })
@@ -122,8 +124,6 @@ function editCategory() {
       updatedItem.name = data?.data.name_en;
       updatedItem.title = data?.data.name_ru;
       updatedItem.image = `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data?.data.image_src}`;
-
-      editModal.value = false; // Modalni yopish
 
       // Formani tozalash
       formState.name = "";
@@ -201,6 +201,12 @@ const items = (row) => [
         )
           .then((response) => {
             if (response.ok) {
+              toast.add({
+                title: "Deleted",
+                icon: "material-symbols:delete-outline",
+                timeout: 2000,
+                color: "red",
+              });
               // Agar serverdan muvaffaqiyatli o‘chirilgan bo‘lsa
               people.value = people.value.filter((p) => p.id !== row.id);
             } else {

@@ -1,4 +1,5 @@
 <script setup>
+const toast = useToast();
 const people = ref([]);
 const addModal = ref(false);
 const editModal = ref(false);
@@ -15,6 +16,7 @@ function handleFileChange(event) {
 }
 
 function submitCategory() {
+  addModal.value = false; // Modalni yopish
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
   formData.append("title", formState.title);
@@ -35,6 +37,12 @@ function submitCategory() {
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
+      } else {
+        toast.add({
+          title: "Brand added",
+          icon: "i-heroicons-check-circle",
+          timeout: 3000,
+        });
       }
       return response.json();
     })
@@ -47,9 +55,6 @@ function submitCategory() {
         image: `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data.data.image_src}`,
       });
 
-      // Modalni yopish
-      addModal.value = false;
-
       // Formani tozalash
       formState.title = "";
       formState.images = null;
@@ -60,6 +65,7 @@ function submitCategory() {
 }
 
 function editCategory() {
+  editModal.value = false; // Modalni yopish
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
 
@@ -88,6 +94,12 @@ function editCategory() {
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
+      } else {
+        toast.add({
+          title: "Edited",
+          icon: "i-heroicons-check-circle",
+          timeout: 3000,
+        });
       }
       return response.json();
     })
@@ -96,8 +108,6 @@ function editCategory() {
       const updatedItem = people.value.find((p) => p.id === selectedId.value);
       updatedItem.title = data?.data.title;
       updatedItem.image = `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data?.data.image_src}`;
-
-      editModal.value = false; // Modalni yopish
 
       // Formani tozalash
       formState.title = "";
@@ -161,6 +171,12 @@ const items = (row) => [
             Authorization: `Bearer ${token}`,
           },
         }).then(() => {
+          toast.add({
+            title: "Deleted",
+            icon: "material-symbols:delete-outline",
+            timeout: 2000,
+            color: "red",
+          });
           // O'chirilgandan keyin arraydan o'chirish
           people.value = people.value.filter((p) => p.id !== row.id);
         });

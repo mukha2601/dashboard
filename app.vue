@@ -7,4 +7,3 @@
   <UNotifications />
   <UModals />
 </template>
-
