@@ -26,8 +26,6 @@ function onSubmit() {
   })
     .then((data) => data.json())
     .then((item) => {
-      console.log(item);
-
       if (item?.success) {
         localStorage.setItem(
           "accessToken",

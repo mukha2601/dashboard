@@ -1,8 +1,10 @@
 <script setup>
+const toast = useToast();
 const rowItem = ref([]);
 const addModal = ref(false);
 const editModal = ref(false);
 const selectedId = ref(null);
+const selectedItem = ref(null);
 const brands = ref([]);
 
 function editModalFunc(event) {
@@ -35,6 +37,12 @@ function submitModel() {
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
+      } else {
+        toast.add({
+          title: response.statusText,
+          icon: "i-heroicons-check-circle",
+          timeout: 3000,
+        });
       }
       return response.json();
     })
@@ -60,7 +68,7 @@ function editCategory() {
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
 
-  const selectedItem = rowItem.value.find((p) => p.id === selectedId.value);
+  // selectedItem.value = rowItem.value.find((p) => p.id === selectedId.value);
   formData.append("name", formState.name || selectedItem.name);
   formData.append(
     "brand_id",
@@ -81,6 +89,12 @@ function editCategory() {
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
+      } else {
+        toast.add({
+          title: "Edited",
+          icon: "i-heroicons-check-circle",
+          timeout: 3000,
+        });
       }
       return response.json();
     })
@@ -146,12 +160,23 @@ const items = (row) => [
       label: "Edit",
       icon: "i-heroicons-pencil-square-20-solid",
       click: () => {
-        const selectedItem = rowItem.value.find(
+        // Hozirgi qatorning id sini yangilash
+        selectedId.value = row.id;
+
+        // Hozirgi qatorning elementini olish
+        selectedItem.value = rowItem.value.find(
           (p) => p.id === selectedId.value
         );
-        formState.name = selectedItem?.name || "";
-        formState.brand_id =
-          brands.value.find((b) => b.title === selectedItem?.brand)?.id || "";
+
+        if (selectedItem.value) {
+          formState.name = selectedItem.value.name || "";
+          formState.brand_id =
+            brands.value.find((b) => b.title === selectedItem.value.brand)
+              ?.id || "";
+        } else {
+          console.error("Qator elementi topilmadi");
+        }
+
         editModal.value = true;
       },
     },
@@ -165,9 +190,29 @@ const items = (row) => [
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }).then(() => {
-          rowItem.value = rowItem.value.filter((p) => p.id !== row.id);
-        });
+        })
+          .then((response) => {
+            if (response.ok) {
+              toast.add({
+                title: "Deleted",
+                icon: "material-symbols:delete-outline",
+                timeout: 2000,
+                color: "red",
+              });
+              // Agar serverdan muvaffaqiyatli o‘chirilgan bo‘lsa
+              rowItem.value = rowItem.value.filter((p) => p.id !== row.id);
+            } else {
+              toast.add({
+                title: response.statusText,
+                icon: "carbon:close-filled",
+                timeout: 2000,
+                color: "red",
+              });
+            }
+          })
+          .catch((error) => {
+            console.error("DELETE so‘rovi bajarilmadi:", error);
+          });
       },
     },
   ],
