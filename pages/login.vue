@@ -57,7 +57,6 @@ function onSubmit() {
 </script>
 
 <template>
-  <!-- <div class="w-full h-screen flex justify-center items-center"> -->
   <div class="p-8 border-2 border-primary">
     <UForm :state="state" class="space-y-4" @submit.prevent="onSubmit()">
       <UFormGroup label="Phone" name="phone">
@@ -71,5 +70,4 @@ function onSubmit() {
       <UButton type="submit"> Submit </UButton>
     </UForm>
   </div>
-  <!-- </div> -->
 </template>

@@ -21,7 +21,6 @@ function submitCategory() {
   const formData = new FormData();
   formData.append("title", formState.title);
 
-
   if (formState.images) {
     formData.append("images", formState.images);
   }
