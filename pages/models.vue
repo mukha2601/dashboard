@@ -23,15 +23,20 @@ function submitModel() {
   addModal.value = false;
 
   const token = localStorage.getItem("accessToken");
-  const formData = new FormData();
-  formData.append("name", formState.name);
-  formData.append("brand_id", formState.brand_id);
+  // const formData = new FormData();
+  // formData.append("name", formState.name);
+  // formData.append("brand_id", formState.brand_id);
 
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/models", {
     method: "POST",
-    body: formData,
+    // body: formData,
+    body: JSON.stringify({
+      name: formState.name,
+      brand_id: formState.brand_id,
+    }),
     headers: {
       Authorization: `Bearer ${token}`,
+      "Content-type": "application/json",
     },
   })
     .then((response) => {
@@ -303,7 +308,7 @@ const rows = computed(() => {
     </UModal>
 
     <div
-      class="flex justify-end px-3 py-3.5 dark:border-gray-700"
+      class="flex justify-end px-3 py-3.5 dark:border-gray-700 sticky top-0 bg-[#191A19] z-10"
     >
       <UButton label="Add Model" class="me-4" @click="addModal = true" />
       <UPagination
@@ -313,18 +318,16 @@ const rows = computed(() => {
       />
     </div>
 
-    <div class="h-[600px] overflow-y-scroll">
-      <UTable :rows="rows" :columns="columns" class="overflow-y-hidden">
-        <template #actions-data="{ row }">
-          <UDropdown :items="items(row)">
-            <UButton
-              color="gray"
-              variant="ghost"
-              icon="i-heroicons-ellipsis-horizontal-20-solid"
-            />
-          </UDropdown>
-        </template>
-      </UTable>
-    </div>
+    <UTable :rows="rows" :columns="columns">
+      <template #actions-data="{ row }">
+        <UDropdown :items="items(row)">
+          <UButton
+            color="gray"
+            variant="ghost"
+            icon="i-heroicons-ellipsis-horizontal-20-solid"
+          />
+        </UDropdown>
+      </template>
+    </UTable>
   </div>
 </template>

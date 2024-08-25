@@ -282,7 +282,7 @@ const rows = computed(() => {
 
     <!-- ------------------------------ Edit Modal End ------------------------------- -->
     <div
-      class="flex justify-end px-3 py-3.5 dark:border-gray-700"
+      class="flex justify-end px-3 py-3.5 dark:border-gray-700 sticky top-0 bg-[#191A19] z-10"
     >
       <UButton label="Add Brand" class="me-4" @click="addModal = true" />
       <UPagination
@@ -293,25 +293,23 @@ const rows = computed(() => {
     </div>
 
     <!-- -------------------------------- Table -------------------------------------- -->
-    <div class="h-[600px] overflow-y-scroll">
-      <UTable :rows="rows" :columns="columns" class="overflow-y-hidden">
-        <template #image-data="{ row }">
-          <img
-            :src="row.image"
-            alt="Category Image"
-            class="h-24 w-40 object-cover"
+    <UTable :rows="rows" :columns="columns">
+      <template #image-data="{ row }">
+        <img
+          :src="row.image"
+          alt="Category Image"
+          class="h-24 w-40 object-cover"
+        />
+      </template>
+      <template #actions-data="{ row }">
+        <UDropdown :items="items(row)">
+          <UButton
+            color="gray"
+            variant="ghost"
+            icon="i-heroicons-ellipsis-horizontal-20-solid"
           />
-        </template>
-        <template #actions-data="{ row }">
-          <UDropdown :items="items(row)">
-            <UButton
-              color="gray"
-              variant="ghost"
-              icon="i-heroicons-ellipsis-horizontal-20-solid"
-            />
-          </UDropdown>
-        </template>
-      </UTable>
-    </div>
+        </UDropdown>
+      </template>
+    </UTable>
   </div>
 </template>

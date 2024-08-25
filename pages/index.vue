@@ -5,7 +5,23 @@ const addModal = ref(false);
 const editModal = ref(false);
 const selectedId = ref(null);
 
-function editModalFunc(event) {
+// sahifa ishga tushishidan oldin ishlaydigan funksiya
+onMounted(() => {
+  fetch("https://autoapi.dezinfeksiyatashkent.uz/api/categories")
+    .then((response) => response.json())
+    .then((items) => {
+      items?.data?.map((item) => {
+        people.value.push({
+          id: item.id,
+          name: item.name_en,
+          title: item.name_ru,
+          image: `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${item.image_src}`,
+        });
+      });
+    });
+});
+
+function editModalClose(event) {
   editModal.value = event;
   formState.name = "";
   formState.title = "";
@@ -23,8 +39,36 @@ function handleFileChange(event) {
   formState.images = event;
 }
 
+function deleteItem(row) {
+  const token = localStorage.getItem("accessToken");
+
+  fetch(`https://autoapi.dezinfeksiyatashkent.uz/api/categories/${row.id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((response) => {
+      if (response.ok) {
+        toast.add({
+          title: "Deleted",
+          icon: "material-symbols:delete-outline",
+          timeout: 2000,
+          color: "red",
+        });
+        // Agar serverdan muvaffaqiyatli o‘chirilgan bo‘lsa
+        people.value = people.value.filter((p) => p.id !== row.id);
+      } else {
+        console.error("Serverdan o‘chirishda xatolik:", response.status);
+      }
+    })
+    .catch((error) => {
+      console.error("DELETE so‘rovi bajarilmadi:", error);
+    });
+}
+
 // yangi categoriya qoshadigan funksiya
-function submitCategory() {
+function create() {
   // Modalni yopish
   addModal.value = false;
 
@@ -74,8 +118,17 @@ function submitCategory() {
       console.error("Error:", error);
     });
 }
+
+function editModalFunc(row) {
+  formState.name = row.name;
+  formState.title = row.title;
+  formState.images = null; // yangi fayl tanlanmagan bo'lsa bo'sh qoldiriladi
+  formState.oldImage = row.image; // eski suratni saqlaymiz
+  selectedId.value = row.id; // Tahrirlanayotgan qatorning ID'sini saqlash
+  editModal.value = true; // Tahrirlash oynasini ochish
+}
 // categoriyani taxrirlovchi funksiya
-function editCategory() {
+function edit() {
   editModal.value = false; // Modalni yopish
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
@@ -136,21 +189,7 @@ function editCategory() {
     });
 }
 
-// sahifa ishga tushishidan oldin ishlaydigan funksiya
-onMounted(() => {
-  fetch("https://autoapi.dezinfeksiyatashkent.uz/api/categories")
-    .then((response) => response.json())
-    .then((items) => {
-      items?.data?.map((item) => {
-        people.value.push({
-          id: item.id,
-          name: item.name_en,
-          title: item.name_ru,
-          image: `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${item.image_src}`,
-        });
-      });
-    });
-});
+
 
 const columns = [
   {
@@ -167,63 +206,14 @@ const columns = [
   },
   {
     key: "actions",
+    label: "Actions",
   },
 ];
 
-const items = (row) => [
-  [
-    {
-      label: "Edit",
-      icon: "i-heroicons-pencil-square-20-solid",
-      click: () => {
-        formState.name = row.name;
-        formState.title = row.title;
-        formState.images = null; // yangi fayl tanlanmagan bo'lsa bo'sh qoldiriladi
-        formState.oldImage = row.image; // eski suratni saqlaymiz
-        selectedId.value = row.id; // Tahrirlanayotgan qatorning ID'sini saqlash
-        editModal.value = true; // Tahrirlash oynasini ochish
-      },
-    },
-    {
-      label: "Delete",
-      icon: "i-heroicons-trash-20-solid",
-      click: () => {
-        const token = localStorage.getItem("accessToken");
 
-        fetch(
-          `https://autoapi.dezinfeksiyatashkent.uz/api/categories/${row.id}`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
-          .then((response) => {
-            if (response.ok) {
-              toast.add({
-                title: "Deleted",
-                icon: "material-symbols:delete-outline",
-                timeout: 2000,
-                color: "red",
-              });
-              // Agar serverdan muvaffaqiyatli o‘chirilgan bo‘lsa
-              people.value = people.value.filter((p) => p.id !== row.id);
-            } else {
-              console.error("Serverdan o‘chirishda xatolik:", response.status);
-            }
-          })
-          .catch((error) => {
-            console.error("DELETE so‘rovi bajarilmadi:", error);
-          });
-      },
-    },
-  ],
-];
-
-// sahifada 5 ta itemdan oshib ketsa keyingi sahifadagi table saqlaydi
+// table da nechta qator ko'rinishini hisoblaydi
 const page = ref(1);
-const pageCount = 5;
+const pageCount = 4;
 const rows = computed(() => {
   return people.value.slice(
     (page.value - 1) * pageCount,
@@ -256,7 +246,7 @@ const rows = computed(() => {
         </template>
         <UForm
           :state="formState"
-          @submit.prevent="submitCategory"
+          @submit.prevent="create"
           class="py-4 flex flex-col gap-4"
         >
           <UFormGroup label="Name" name="name">
@@ -296,13 +286,13 @@ const rows = computed(() => {
               variant="ghost"
               icon="i-heroicons-x-mark-20-solid"
               class="-my-1"
-              @click="editModalFunc(false)"
+              @click="editModalClose(false)"
             />
           </div>
         </template>
         <UForm
           :state="formState"
-          @submit.prevent="editCategory"
+          @submit.prevent="edit"
           class="py-4 flex flex-col gap-4"
         >
           <UFormGroup label="Name" name="name">
@@ -324,10 +314,9 @@ const rows = computed(() => {
         </UForm>
       </UCard>
     </UModal>
-
     <!-- ------------------------------ Edit Modal End ------------------------------- -->
     <div
-      class="flex justify-end px-3 py-3.5 dark:border-gray-700"
+      class="flex justify-end px-3 py-3.5 dark:border-gray-700 sticky top-0 bg-[#191A19] z-10"
     >
       <UButton label="Add categories" class="me-4" @click="addModal = true" />
       <UPagination
@@ -336,25 +325,12 @@ const rows = computed(() => {
         :total="people.length"
       />
     </div>
-    <div class="h-[600px] overflow-y-scroll">
-      <UTable :rows="rows" :columns="columns" class="overflow-y-hidden">
-        <template #image-data="{ row }">
-          <img
-            :src="row.image"
-            alt="Category Image"
-            class="h-24 w-40 object-cover"
-          />
-        </template>
-        <template #actions-data="{ row }">
-          <UDropdown :items="items(row)">
-            <UButton
-              color="gray"
-              variant="ghost"
-              icon="i-heroicons-ellipsis-horizontal-20-solid"
-            />
-          </UDropdown>
-        </template>
-      </UTable>
-    </div>
+
+    <Table
+      :rows="rows"
+      :columns="columns"
+      :edit-modal-func="editModalFunc"
+      :delete-item="deleteItem"
+    />
   </div>
 </template>
