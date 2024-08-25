@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full bg-[#1f2937] h-[10vh] flex justify-end p-4">
+  <div class="w-full bg-[#191A19] h-[10vh] flex justify-end p-4 rounded-md">
     <UDropdown :items="items" :popper="{ placement: 'bottom-start' }">
       <UButton
         color="white"
@@ -30,30 +30,7 @@ const items = [
       },
     },
   ],
-  [
-    {
-      label: "Edit",
-      icon: "i-heroicons-pencil-square-20-solid",
-      shortcuts: ["E"],
-      disabled: true,
-      click: () => {
-        console.log("Edit");
-      },
-    },
-    {
-      label: "Duplicate",
-      icon: "i-heroicons-document-duplicate-20-solid",
-      shortcuts: ["D"],
-      disabled: true,
-    },
-  ],
-  [
-    {
-      label: "Move",
-      icon: "i-heroicons-arrow-right-circle-20-solid",
-      disabled: true,
-    },
-  ],
+
   [
     {
       label: "Log out",

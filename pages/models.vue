@@ -303,7 +303,7 @@ const rows = computed(() => {
     </UModal>
 
     <div
-      class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700"
+      class="flex justify-end px-3 py-3.5 dark:border-gray-700"
     >
       <UButton label="Add Model" class="me-4" @click="addModal = true" />
       <UPagination

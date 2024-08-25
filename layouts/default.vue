@@ -1,7 +1,7 @@
 <template>
-  <div class="flex h-screen">
+  <div class="flex h-screen gap-4 p-4">
     <Sidebar />
-    <div class="w-full flex flex-col h-screen">
+    <div class="w-full flex flex-col h-screen gap-4">
       <Header />
       <slot />
     </div>

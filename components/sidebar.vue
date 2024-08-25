@@ -1,5 +1,5 @@
 <template>
-  <div class="w-1/4 bg-[#1E201E] p-4 flex flex-col justify-center">
+  <div class="w-1/4 bg-[#191A19] p-4 flex flex-col justify-center rounded-md">
     <UVerticalNavigation :links="links">
       <template #default="{ link }">
         <span class="group-hover:text-primary relative ms-2 p-4">{{
@@ -37,11 +37,11 @@ const links = [
     icon: "material-symbols:transportation",
     to: "/models",
   },
-  {
-    label: "Locations",
-    icon: "material-symbols:location-on",
-    to: "/locations",
-  },
+  // {
+  //   label: "Locations",
+  //   icon: "material-symbols:location-on",
+  //   to: "/locations",
+  // },
   {
     label: "Cities",
     icon: "material-symbols:emoji-transportation",
