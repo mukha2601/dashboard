@@ -26,115 +26,115 @@ console.log(formState.open);
 //   formState.images = event;
 // }
 
-function submitCategory() {
-  addModal.value = false; // Modalni yopish
-  const token = localStorage.getItem("accessToken");
-  const formData = new FormData();
-  formData.append("name", formState.name);
-  formData.append("text", formState.text);
+// function submitCategory() {
+//   addModal.value = false; // Modalni yopish
+//   const token = localStorage.getItem("accessToken");
+//   const formData = new FormData();
+//   formData.append("name", formState.name);
+//   formData.append("text", formState.text);
 
-  if (formState.images) {
-    formData.append("images", formState.images);
-  }
+//   if (formState.images) {
+//     formData.append("images", formState.images);
+//   }
 
-  fetch("https://autoapi.dezinfeksiyatashkent.uz/api/cities", {
-    method: "POST",
-    body: formData,
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      } else {
-        toast.add({
-          title: "City added",
-          icon: "i-heroicons-check-circle",
-          timeout: 3000,
-        });
-      }
-      return response.json();
-    })
-    .then((data) => {
-      // Yangi kategoriya qo'shilgandan keyin ma'lumotlar yangilanadi
-      cities.value.push({
-        id: data.data.id,
-        name: data.data.name,
-        text: data.data.text,
-        image: `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data.data.image_src}`,
-      });
+//   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/cities", {
+//     method: "POST",
+//     body: formData,
+//     headers: {
+//       Authorization: `Bearer ${token}`,
+//     },
+//   })
+//     .then((response) => {
+//       if (!response.ok) {
+//         throw new Error("Network response was not ok");
+//       } else {
+//         toast.add({
+//           title: "City added",
+//           icon: "i-heroicons-check-circle",
+//           timeout: 3000,
+//         });
+//       }
+//       return response.json();
+//     })
+//     .then((data) => {
+//       // Yangi kategoriya qo'shilgandan keyin ma'lumotlar yangilanadi
+//       cities.value.push({
+//         id: data.data.id,
+//         name: data.data.name,
+//         text: data.data.text,
+//         image: `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data.data.image_src}`,
+//       });
 
-      // Formani tozalash
-      formState.name = "";
-      formState.text = "";
-      formState.images = null;
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-}
+//       // Formani tozalash
+//       formState.name = "";
+//       formState.text = "";
+//       formState.images = null;
+//     })
+//     .catch((error) => {
+//       console.error("Error:", error);
+//     });
+// }
 
-function editCategory() {
-  editModal.value = false; // Modalni yopish
-  const token = localStorage.getItem("accessToken");
-  const formData = new FormData();
+// function editCategory() {
+//   editModal.value = false; // Modalni yopish
+//   const token = localStorage.getItem("accessToken");
+//   const formData = new FormData();
 
-  formData.append(
-    "name",
-    formState.name || cities.value.find((p) => p.id === selectedId.value).name
-  );
-  formData.append(
-    "text",
-    formState.text || cities.value.find((p) => p.id === selectedId.value).text
-  );
+//   formData.append(
+//     "name",
+//     formState.name || cities.value.find((p) => p.id === selectedId.value).name
+//   );
+//   formData.append(
+//     "text",
+//     formState.text || cities.value.find((p) => p.id === selectedId.value).text
+//   );
 
-  // Agar yangi rasm tanlangan bo'lsa, uni formData'ga qo'shing, aks holda eski rasmni oling
-  if (formState.images) {
-    formData.append("images", formState.images); // yangi surat
-  } else {
-    formData.append("image_src", formState.oldImage); // eski suratni yuborish
-  }
+//   // Agar yangi rasm tanlangan bo'lsa, uni formData'ga qo'shing, aks holda eski rasmni oling
+//   if (formState.images) {
+//     formData.append("images", formState.images); // yangi surat
+//   } else {
+//     formData.append("image_src", formState.oldImage); // eski suratni yuborish
+//   }
 
-  fetch(
-    `https://autoapi.dezinfeksiyatashkent.uz/api/cities/${selectedId.value}`,
-    {
-      method: "PUT",
-      body: formData,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      } else {
-        toast.add({
-          title: "Edited",
-          icon: "i-heroicons-check-circle",
-          timeout: 3000,
-        });
-      }
-      return response.json();
-    })
-    .then((data) => {
-      // Ma'lumotni yangilash
-      const updatedItem = cities.value.find((p) => p.id === selectedId.value);
-      updatedItem.name = data?.data.name;
-      updatedItem.text = data?.data.text;
-      updatedItem.image = `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data?.data.image_src}`;
+//   fetch(
+//     `https://autoapi.dezinfeksiyatashkent.uz/api/cities/${selectedId.value}`,
+//     {
+//       method: "PUT",
+//       body: formData,
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     }
+//   )
+//     .then((response) => {
+//       if (!response.ok) {
+//         throw new Error("Network response was not ok");
+//       } else {
+//         toast.add({
+//           title: "Edited",
+//           icon: "i-heroicons-check-circle",
+//           timeout: 3000,
+//         });
+//       }
+//       return response.json();
+//     })
+//     .then((data) => {
+//       // Ma'lumotni yangilash
+//       const updatedItem = cities.value.find((p) => p.id === selectedId.value);
+//       updatedItem.name = data?.data.name;
+//       updatedItem.text = data?.data.text;
+//       updatedItem.image = `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data?.data.image_src}`;
 
-      // Formani tozalash
-      formState.name = "";
-      formState.text = "";
-      formState.images = null;
-      formState.oldImage = null;
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-}
+//       // Formani tozalash
+//       formState.name = "";
+//       formState.text = "";
+//       formState.images = null;
+//       formState.oldImage = null;
+//     })
+//     .catch((error) => {
+//       console.error("Error:", error);
+//     });
+// }
 
 onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/cities")

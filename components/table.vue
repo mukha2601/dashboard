@@ -12,9 +12,9 @@
         <UButton
           label="Edit"
           color="gray"
-          @click="formState.openEditModal(row)"
+          @click="openModal(row)"
         />
-        <UButton label="Delete" color="red" @click="deleteCategory(row)" />
+        <UButton label="Delete" color="red" @click="deleteItem(row)" />
       </div>
     </template>
   </UTable>
@@ -31,7 +31,11 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-  deleteCategory: {
+  deleteItem: {
+    type: Function,
+    required: true,
+  },
+  openModal: {
     type: Function,
     required: true,
   },

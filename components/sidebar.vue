@@ -10,9 +10,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
-const route = useRoute();
-
+<script setup>
 const links = [
   // {
   //   label: "Dashboard",

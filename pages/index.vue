@@ -158,6 +158,11 @@ const rows = computed(() => {
       />
     </div>
 
-    <Table :rows="rows" :columns="columns" :delete-category="deleteCategory" />
+    <Table
+      :rows="rows"
+      :columns="columns"
+      :delete-item="deleteCategory"
+      :open-modal="formState.openEditModal"
+    />
   </div>
 </template>

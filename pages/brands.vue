@@ -1,161 +1,17 @@
 <script setup>
 import { useBrandsStore } from "../store";
+import { createBrands } from "../utils/post";
+import { updateBrands } from "../utils/put";
+import { deleteBrands } from "../utils/delete";
 const toast = useToast();
-const people = ref([]);
-const addModal = ref(false);
-const editModal = ref(false);
-const selectedId = ref(null);
-
-const formState = useBrandsStore();
-
-// const formState = reactive({
-//   title: "",
-//   images: null, // yangi surat
-//   oldImage: null, // eski surat
-// });
-
-function deleteItem(row) {
-  const token = localStorage.getItem("accessToken");
-
-  fetch(`https://autoapi.dezinfeksiyatashkent.uz/api/categories/${row.id}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then((response) => {
-      if (response.ok) {
-        toast.add({
-          title: "Deleted",
-          icon: "material-symbols:delete-outline",
-          timeout: 2000,
-          color: "red",
-        });
-        // Agar serverdan muvaffaqiyatli o‘chirilgan bo‘lsa
-
-        formState.rowItem.value = formState.rowItem.value.filter(
-          (p) => p.id !== row.id
-        );
-      } else {
-        console.error("Serverdan o‘chirishda xatolik:", response.status);
-      }
-    })
-    .catch((error) => {
-      console.error("DELETE so‘rovi bajarilmadi:", error);
-    });
-}
-
-function handleFileChange(event) {
-  formState.images = event;
-}
-
-function submitCategory() {
-  addModal.value = false; // Modalni yopish
-  const token = localStorage.getItem("accessToken");
-  const formData = new FormData();
-  formData.append("title", formState.title);
-
-  if (formState.images) {
-    formData.append("images", formState.images);
-  }
-
-  fetch("https://autoapi.dezinfeksiyatashkent.uz/api/brands", {
-    method: "POST",
-    body: formData,
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      } else {
-        toast.add({
-          title: "Brand added",
-          icon: "i-heroicons-check-circle",
-          timeout: 3000,
-        });
-      }
-      return response.json();
-    })
-    .then((data) => {
-      // Yangi kategoriya qo'shilgandan keyin ma'lumotlar yangilanadi
-      people.value.push({
-        id: data.data.id,
-        title: data.data.title,
-        image: `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data.data.image_src}`,
-      });
-
-      // Formani tozalash
-      formState.title = "";
-      formState.images = null;
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-}
-
-function editCategory() {
-  editModal.value = false; // Modalni yopish
-  const token = localStorage.getItem("accessToken");
-  const formData = new FormData();
-
-  formData.append(
-    "title",
-    formState.title || people.value.find((p) => p.id === selectedId.value).title
-  );
-
-  // Agar yangi rasm tanlangan bo'lsa, uni formData'ga qo'shing, aks holda eski rasmni oling
-  if (formState.images) {
-    formData.append("images", formState.images); // yangi surat
-  } else {
-    formData.append("image_src", formState.oldImage); // eski suratni yuborish
-  }
-
-  fetch(
-    `https://autoapi.dezinfeksiyatashkent.uz/api/brands/${selectedId.value}`,
-    {
-      method: "PUT",
-      body: formData,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      } else {
-        toast.add({
-          title: "Edited",
-          icon: "i-heroicons-check-circle",
-          timeout: 3000,
-        });
-      }
-      return response.json();
-    })
-    .then((data) => {
-      // Ma'lumotni yangilash
-      const updatedItem = people.value.find((p) => p.id === selectedId.value);
-      updatedItem.title = data?.data.title;
-      updatedItem.image = `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data?.data.image_src}`;
-
-      // Formani tozalash
-      formState.title = "";
-      formState.images = null;
-      formState.oldImage = null;
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-}
+const brands = useBrandsStore();
 
 onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/brands")
     .then((response) => response.json())
     .then((items) => {
       items?.data?.map((item) => {
-        people.value.push({
+        brands.rowItem.push({
           id: item.id,
           title: item.title,
           image: `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${item.image_src}`,
@@ -175,52 +31,15 @@ const columns = [
   },
   {
     key: "actions",
+    label: "Actions",
   },
-];
-
-const items = (row) => [
-  [
-    {
-      label: "Edit",
-      icon: "i-heroicons-pencil-square-20-solid",
-      click: () => {
-        formState.title = row.title;
-        formState.images = null; // yangi fayl tanlanmagan bo'lsa bo'sh qoldiriladi
-        formState.oldImage = row.image; // eski suratni saqlaymiz
-        selectedId.value = row.id; // Tahrirlanayotgan qatorning ID'sini saqlash
-        editModal.value = true; // Tahrirlash oynasini ochish
-      },
-    },
-    {
-      label: "Delete",
-      icon: "i-heroicons-trash-20-solid",
-      click: () => {
-        const token = localStorage.getItem("accessToken");
-        fetch(`https://autoapi.dezinfeksiyatashkent.uz/api/brands/${row.id}`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }).then(() => {
-          toast.add({
-            title: "Deleted",
-            icon: "material-symbols:delete-outline",
-            timeout: 2000,
-            color: "red",
-          });
-          // O'chirilgandan keyin arraydan o'chirish
-          people.value = people.value.filter((p) => p.id !== row.id);
-        });
-      },
-    },
-  ],
 ];
 
 // sahifada 5 ta itemdan oshib ketsa keyingi sahifadagi table saqlaydi
 const page = ref(1);
 const pageCount = 5;
 const rows = computed(() => {
-  return people.value.slice(
+  return brands.rowItem.slice(
     (page.value - 1) * pageCount,
     page.value * pageCount
   );
@@ -230,7 +49,7 @@ const rows = computed(() => {
 <template>
   <div>
     <!-- ------------------------------ Add Modal ------------------------------------ -->
-    <UModal v-model="addModal" prevent-close>
+    <UModal v-model="brands.addModal" prevent-close>
       <UCard
         :ui="{
           ring: '',
@@ -245,20 +64,20 @@ const rows = computed(() => {
               variant="ghost"
               icon="i-heroicons-x-mark-20-solid"
               class="-my-1"
-              @click="addModal = false"
+              @click="brands.addModal = false"
             />
           </div>
         </template>
         <UForm
-          :state="formState"
-          @submit.prevent="submitCategory"
+          :state="brands"
+          @submit.prevent="createBrands"
           class="py-4 flex flex-col gap-4"
         >
           <UFormGroup label="Title" name="title">
-            <UInput v-model="formState.title" required autocomplete="off" />
+            <UInput v-model="brands.title" required autocomplete="off" />
           </UFormGroup>
           <UInput
-            @input="handleFileChange($event.target.files[0])"
+            @input="brands.handleFileChange($event.target.files[0])"
             type="file"
             size="sm"
             icon="i-heroicons-folder"
@@ -273,7 +92,7 @@ const rows = computed(() => {
     <!-- ------------------------------ Add Modal End -------------------------------- -->
 
     <!-- ------------------------------ Edit Modal ----------------------------------- -->
-    <UModal v-model="editModal" prevent-close>
+    <UModal v-model="brands.editModal" prevent-close>
       <UCard
         :ui="{
           ring: '',
@@ -288,20 +107,20 @@ const rows = computed(() => {
               variant="ghost"
               icon="i-heroicons-x-mark-20-solid"
               class="-my-1"
-              @click="editModal = false"
+              @click="brands.editModal = false"
             />
           </div>
         </template>
         <UForm
-          :state="formState"
-          @submit.prevent="editCategory"
+          :state="brands"
+          @submit.prevent="updateBrands"
           class="py-4 flex flex-col gap-4"
         >
           <UFormGroup label="Title" name="title">
-            <UInput v-model="formState.title" autocomplete="off" />
+            <UInput v-model="brands.title" autocomplete="off" />
           </UFormGroup>
           <UInput
-            @input="handleFileChange($event.target.files[0])"
+            @input="brands.handleFileChange($event.target.files[0])"
             type="file"
             size="sm"
             icon="i-heroicons-folder"
@@ -318,34 +137,20 @@ const rows = computed(() => {
     <div
       class="flex justify-end px-3 py-3.5 dark:border-gray-700 sticky top-0 bg-[#191A19] z-10"
     >
-      <UButton label="Add Brand" class="me-4" @click="addModal = true" />
+      <UButton label="Add Brand" class="me-4" @click="brands.addModal = true" />
       <UPagination
         v-model="page"
         :page-count="pageCount"
-        :total="people.length"
+        :total="brands.rowItem.length"
       />
     </div>
 
     <!-- -------------------------------- Table -------------------------------------- -->
-    <!-- <UTable :rows="rows" :columns="columns">
-      <template #image-data="{ row }">
-        <img
-          :src="row.image"
-          alt="Category Image"
-          class="h-24 w-40 object-cover"
-        />
-      </template>
-      <template #actions-data="{ row }">
-        <UDropdown :items="items(row)">
-          <UButton
-            color="gray"
-            variant="ghost"
-            icon="i-heroicons-ellipsis-horizontal-20-solid"
-          />
-        </UDropdown>
-      </template>
-    </UTable> -->
-
-    <Table :rows="rows" :columns="columns" :delete-item="deleteItem"/>
+    <Table
+      :rows="rows"
+      :columns="columns"
+      :delete-item="deleteBrands"
+      :open-modal="brands.openEditModal"
+    />
   </div>
 </template>

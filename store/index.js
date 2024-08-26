@@ -34,26 +34,80 @@ export const useCategoryStore = defineStore("formState", {
   },
 });
 
-export const useBrandsStore = defineStore("formState", {
+export const useBrandsStore = defineStore("brands", {
   state: () => {
     return {
+      rowItem: [],
+      addModal: false,
+      editModal: false,
+      selectedId: null,
       title: "",
       images: null, // yangi surat
       oldImage: null, // eski surat
     };
   },
+  actions: {
+    openEditModal(row) {
+      this.title = row.title;
+      this.images = null; // yangi fayl tanlanmagan bo'lsa bo'sh qoldiriladi
+      this.oldImage = row.image; // eski suratni saqlaymiz
+      this.selectedId = row.id; // Tahrirlanayotgan qatorning ID'sini saqlash
+      this.editModal = true; // Tahrirlash oynasini ochish
+    },
+    closeEditModal() {
+      this.editModal = false;
+      this.title = "";
+    },
+    handleFileChange(event) {
+      this.images = event;
+    },
+  },
 });
 
-export const useModelsStore = defineStore("formState", {
+export const useModelsStore = defineStore("models", {
   state: () => {
     return {
+      rowItem: [],
+      addModal: false,
+      editModal: false,
+      selectedId: null,
+      selectedItem: null,
+      brands: [],
       name: "",
       brand_id: "",
     };
   },
+  actions: {
+    openEditModal(row) {
+      // Hozirgi qatorning id sini yangilash
+      this.selectedId = row.id;
+
+      // Hozirgi qatorning elementini olish
+      this.selectedItem = this.rowItem.find((p) => p.id === this.selectedId);
+
+      if (this.selectedItem) {
+        this.name = this.selectedItem.name || "";
+        this.brand_id =
+          this.brands.find((b) => b.title === this.selectedItem.brand)?.id ||
+          "";
+      } else {
+        console.error("Qator elementi topilmadi");
+      }
+
+      this.editModal = true;
+    },
+    closeEditModal() {
+      this.editModal = false;
+      this.name = "";
+      this.brand_id = "";
+    },
+    handleFileChange(event) {
+      this.images = event;
+    },
+  },
 });
 
-export const useCitiesStore = defineStore("formState", {
+export const useCitiesStore = defineStore("cities", {
   state: () => {
     return {
       open: false,
@@ -64,10 +118,16 @@ export const useCitiesStore = defineStore("formState", {
     };
   },
   actions: {
-    closeModal() {
-      this.open = false;
-      this.name = "";
-      this.text = "";
+    openEditModal(row) {
+      this.title = row.title;
+      this.images = null; // yangi fayl tanlanmagan bo'lsa bo'sh qoldiriladi
+      this.oldImage = row.image; // eski suratni saqlaymiz
+      this.selectedId = row.id; // Tahrirlanayotgan qatorning ID'sini saqlash
+      this.editModal = true; // Tahrirlash oynasini ochish
+    },
+    closeEditModal() {
+      this.editModal = false;
+      this.title = "";
     },
     handleFileChange(event) {
       this.images = event;
