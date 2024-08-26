@@ -15,7 +15,7 @@ export const useCategoryStore = defineStore("formState", {
     };
   },
   actions: {
-    openModal(row) {
+    openEditModal(row) {
       this.name = row.name;
       this.title = row.title;
       this.images = null; // yangi fayl tanlanmagan bo'lsa bo'sh qoldiriladi
@@ -23,46 +23,13 @@ export const useCategoryStore = defineStore("formState", {
       this.selectedId = row.id; // Tahrirlanayotgan qatorning ID'sini saqlash
       this.editModal = true; // Tahrirlash oynasini ochish
     },
-    closeModal() {
+    closeEditModal() {
       this.editModal = false;
       this.name = "";
       this.title = "";
     },
     handleFileChange(event) {
       this.images = event;
-    },
-    deleteItem(row) {
-      const token = localStorage.getItem("accessToken");
-
-      fetch(
-        `https://autoapi.dezinfeksiyatashkent.uz/api/categories/${row.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-        .then((response) => {
-          if (response.ok) {
-            toast.add({
-              title: "Deleted",
-              icon: "material-symbols:delete-outline",
-              timeout: 2000,
-              color: "red",
-            });
-            // Agar serverdan muvaffaqiyatli o‘chirilgan bo‘lsa
-
-            formState.rowItem.value = formState.rowItem.value.filter(
-              (p) => p.id !== row.id
-            );
-          } else {
-            console.error("Serverdan o‘chirishda xatolik:", response.status);
-          }
-        })
-        .catch((error) => {
-          console.error("DELETE so‘rovi bajarilmadi:", error);
-        });
     },
   },
 });

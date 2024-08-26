@@ -2,11 +2,9 @@
 import { useCategoryStore } from "../store";
 import { createCategory } from "../utils/post";
 import { updateCaregory } from "../utils/put";
+import { deleteCategory } from "../utils/delete";
 const toast = useToast();
 const formState = useCategoryStore();
-
-// const rowItem = ref([]);
-// const selectedId = ref(null);
 
 // sahifa ishga tushishidan oldin ishlaydigan funksiya
 onMounted(() => {
@@ -21,131 +19,6 @@ onMounted(() => {
       }));
     });
 });
-// onMounted(() => {
-//   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/categories")
-//     .then((response) => response.json())
-//     .then((items) => {
-//       items?.data?.map((item) => {
-//         formState.rowItem.value.push({
-//           id: item.id,
-//           name: item.name_en,
-//           title: item.name_ru,
-//           image: `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${item.image_src}`,
-//         });
-//       });
-//     });
-// });
-
-// function editModalClose(event) {
-//   editModal.value = event;
-//   formState.name = "";
-//   formState.title = "";
-// }
-
-// const formState = reactive({
-//   name: "",
-//   title: "",
-//   images: null, // yangi surat
-//   oldImage: null, // eski surat
-// });
-
-// rasmni beckendga file qilib yuborish uchun hizmat qiladi
-// function handleFileChange(event) {
-//   formState.images = event;
-// }
-
-// function deleteItem(row) {
-//   const token = localStorage.getItem("accessToken");
-
-//   fetch(`https://autoapi.dezinfeksiyatashkent.uz/api/categories/${row.id}`, {
-//     method: "DELETE",
-//     headers: {
-//       Authorization: `Bearer ${token}`,
-//     },
-//   })
-//     .then((response) => {
-//       if (response.ok) {
-//         toast.add({
-//           title: "Deleted",
-//           icon: "material-symbols:delete-outline",
-//           timeout: 2000,
-//           color: "red",
-//         });
-//         // Agar serverdan muvaffaqiyatli o‘chirilgan bo‘lsa
-
-//         formState.rowItem.value = formState.rowItem.value.filter(
-//           (p) => p.id !== row.id
-//         );
-//       } else {
-//         console.error("Serverdan o‘chirishda xatolik:", response.status);
-//       }
-//     })
-//     .catch((error) => {
-//       console.error("DELETE so‘rovi bajarilmadi:", error);
-//     });
-// }
-
-// function create() {
-//   // Modalni yopish
-//   addModal.value = false;
-
-//   const token = localStorage.getItem("accessToken");
-//   const formData = new FormData();
-//   formData.append("name_en", formState.name);
-//   formData.append("name_ru", formState.title);
-
-//   if (formState.images) {
-//     formData.append("images", formState.images);
-//   }
-
-//   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/categories", {
-//     method: "POST",
-//     body: formData,
-//     headers: {
-//       Authorization: `Bearer ${token}`,
-//     },
-//   })
-//     .then((response) => {
-//       if (!response.ok) {
-//         throw new Error("Network response was not ok");
-//       } else {
-//         toast.add({
-//           title: response.statusText,
-//           icon: "i-heroicons-check-circle",
-//           timeout: 3000,
-//         });
-//       }
-//       return response.json();
-//     })
-//     .then((data) => {
-//       // Yangi kategoriya qo'shilgandan keyin ma'lumotlar yangilanadi
-//       rowItem.value.push({
-//         id: data.data.id,
-//         name: data.data.name_en,
-//         title: data.data.name_ru,
-//         image: `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data.data.image_src}`,
-//       });
-
-//       // Formani tozalash
-//       formState.name = "";
-//       formState.title = "";
-//       formState.images = null;
-//     })
-//     .catch((error) => {
-//       console.error("Error:", error);
-//     });
-// }
-
-// function editModalFunc(row) {
-//   formState.name = row.name;
-//   formState.title = row.title;
-//   formState.images = null; // yangi fayl tanlanmagan bo'lsa bo'sh qoldiriladi
-//   formState.oldImage = row.image; // eski suratni saqlaymiz
-//   selectedId.value = row.id; // Tahrirlanayotgan qatorning ID'sini saqlash
-//   editModal.value = true; // Tahrirlash oynasini ochish
-// }
-
-// categoriyani taxrirlovchi funksiya
 
 const columns = [
   {
@@ -241,7 +114,7 @@ const rows = computed(() => {
               variant="ghost"
               icon="i-heroicons-x-mark-20-solid"
               class="-my-1"
-              @click="formState.closeModal"
+              @click="formState.closeEditModal"
             />
           </div>
         </template>
@@ -285,6 +158,6 @@ const rows = computed(() => {
       />
     </div>
 
-    <Table :rows="rows" :columns="columns" />
+    <Table :rows="rows" :columns="columns" :delete-category="deleteCategory" />
   </div>
 </template>
