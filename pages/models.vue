@@ -1,4 +1,5 @@
 <script setup>
+import { useModelsStore } from "../store";
 const toast = useToast();
 const rowItem = ref([]);
 const addModal = ref(false);
@@ -14,10 +15,12 @@ function editModalFunc(event) {
   formState.name = "";
 }
 
-const formState = reactive({
-  name: "",
-  brand_id: "",
-});
+const formState = useModelsStore();
+
+// const formState = reactive({
+//   name: "",
+//   brand_id: "",
+// });
 
 function submitModel() {
   addModal.value = false;

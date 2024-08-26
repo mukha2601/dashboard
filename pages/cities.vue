@@ -1,26 +1,30 @@
 <script setup>
+import { useCitiesStore } from "../store";
 const toast = useToast();
 const cities = ref([]);
-const addModal = ref(false);
+// const addModal = ref(false);
 const editModal = ref(false);
 const selectedId = ref(null);
 
-const formState = reactive({
-  name: "",
-  text: "",
-  images: null, // yangi surat
-  oldImage: null, // eski surat
-});
+const formState = useCitiesStore();
+console.log(formState.open);
 
-function editModalFunc(event) {
-  editModal.value = event;
-  formState.name = "";
-  formState.text = "";
-}
+// const formState = reactive({
+//   name: "",
+//   text: "",
+//   images: null, // yangi surat
+//   oldImage: null, // eski surat
+// });
 
-function handleFileChange(event) {
-  formState.images = event;
-}
+// function editModalFunc(event) {
+//   editModal.value = event;
+//   formState.name = "";
+//   formState.text = "";
+// }
+
+// function handleFileChange(event) {
+//   formState.images = event;
+// }
 
 function submitCategory() {
   addModal.value = false; // Modalni yopish
@@ -178,7 +182,7 @@ const items = (row) => [
         formState.images = null; // yangi fayl tanlanmagan bo'lsa bo'sh qoldiriladi
         formState.oldImage = row.image; // eski suratni saqlaymiz
         selectedId.value = row.id; // Tahrirlanayotgan qatorning ID'sini saqlash
-        editModal.value = true; // Tahrirlash oynasini ochish
+        formState.open = true; // Tahrirlash oynasini ochish
       },
     },
     {
@@ -266,7 +270,7 @@ const rows = computed(() => {
     <!-- ------------------------------ Add Modal End -------------------------------- -->
 
     <!-- ------------------------------ Edit Modal ----------------------------------- -->
-    <UModal v-model="editModal" prevent-close>
+    <UModal v-model="formState.open" prevent-close>
       <UCard
         :ui="{
           ring: '',
@@ -281,7 +285,7 @@ const rows = computed(() => {
               variant="ghost"
               icon="i-heroicons-x-mark-20-solid"
               class="-my-1"
-              @click="editModalFunc(false)"
+              @click="formState.closeModal"
             />
           </div>
         </template>

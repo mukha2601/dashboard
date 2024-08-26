@@ -9,14 +9,15 @@
     </template>
     <template #actions-data="{ row }">
       <div class="flex gap-4">
-        <UButton label="Edit" color="gray" @click="editModalFunc(row)" />
-        <UButton label="Delete" color="red" @click="deleteItem(row)" />
+        <UButton label="Edit" color="gray" @click="formState.openModal(row)" />
+        <UButton label="Delete" color="red" @click="formState.deleteItem(row)" />
       </div>
     </template>
   </UTable>
 </template>
 
 <script setup>
+import { useCategoryStore } from "../store";
 const props = defineProps({
   rows: {
     type: Array,
@@ -26,13 +27,11 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-  editModalFunc: {
-    type: Function,
-    required: true,
-  },
-  deleteItem: {
-    type: Function,
-    required: true,
-  },
+  // deleteItem: {
+  //   type: Function,
+  //   required: true,
+  // },
 });
+
+const formState = useCategoryStore();
 </script>

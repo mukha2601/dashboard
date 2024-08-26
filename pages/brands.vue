@@ -1,15 +1,49 @@
 <script setup>
+import { useBrandsStore } from "../store";
 const toast = useToast();
 const people = ref([]);
 const addModal = ref(false);
 const editModal = ref(false);
 const selectedId = ref(null);
 
-const formState = reactive({
-  title: "",
-  images: null, // yangi surat
-  oldImage: null, // eski surat
-});
+const formState = useBrandsStore();
+
+// const formState = reactive({
+//   title: "",
+//   images: null, // yangi surat
+//   oldImage: null, // eski surat
+// });
+
+function deleteItem(row) {
+  const token = localStorage.getItem("accessToken");
+
+  fetch(`https://autoapi.dezinfeksiyatashkent.uz/api/categories/${row.id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((response) => {
+      if (response.ok) {
+        toast.add({
+          title: "Deleted",
+          icon: "material-symbols:delete-outline",
+          timeout: 2000,
+          color: "red",
+        });
+        // Agar serverdan muvaffaqiyatli o‘chirilgan bo‘lsa
+
+        formState.rowItem.value = formState.rowItem.value.filter(
+          (p) => p.id !== row.id
+        );
+      } else {
+        console.error("Serverdan o‘chirishda xatolik:", response.status);
+      }
+    })
+    .catch((error) => {
+      console.error("DELETE so‘rovi bajarilmadi:", error);
+    });
+}
 
 function handleFileChange(event) {
   formState.images = event;
@@ -293,7 +327,7 @@ const rows = computed(() => {
     </div>
 
     <!-- -------------------------------- Table -------------------------------------- -->
-    <UTable :rows="rows" :columns="columns">
+    <!-- <UTable :rows="rows" :columns="columns">
       <template #image-data="{ row }">
         <img
           :src="row.image"
@@ -310,6 +344,8 @@ const rows = computed(() => {
           />
         </UDropdown>
       </template>
-    </UTable>
+    </UTable> -->
+
+    <Table :rows="rows" :columns="columns" :delete-item="deleteItem"/>
   </div>
 </template>
