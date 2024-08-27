@@ -10,6 +10,7 @@ onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/brands")
     .then((response) => response.json())
     .then((items) => {
+      brands.rowItem = [];
       items?.data?.map((item) => {
         brands.rowItem.push({
           id: item.id,
@@ -37,7 +38,7 @@ const columns = [
 
 // sahifada 5 ta itemdan oshib ketsa keyingi sahifadagi table saqlaydi
 const page = ref(1);
-const pageCount = 5;
+const pageCount = 4;
 const rows = computed(() => {
   return brands.rowItem.slice(
     (page.value - 1) * pageCount,
@@ -70,7 +71,7 @@ const rows = computed(() => {
         </template>
         <UForm
           :state="brands"
-          @submit.prevent="createBrands"
+          @submit.prevent="createBrands()"
           class="py-4 flex flex-col gap-4"
         >
           <UFormGroup label="Title" name="title">
@@ -107,7 +108,7 @@ const rows = computed(() => {
               variant="ghost"
               icon="i-heroicons-x-mark-20-solid"
               class="-my-1"
-              @click="brands.editModal = false"
+              @click="brands.closeEditModal"
             />
           </div>
         </template>

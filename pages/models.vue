@@ -9,6 +9,7 @@ onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/models")
     .then((response) => response.json())
     .then((items) => {
+      models.rowItem = [];
       items?.data?.map((item) => {
         models.rowItem.push({
           id: item.id,
@@ -22,6 +23,7 @@ onMounted(() => {
     .then((response) => response.json())
     .then((data) => {
       if (data?.data) {
+        models.brands = [];
         data.data.map((el) => {
           models.brands.push({ id: el.id, title: el.title });
         });
@@ -48,7 +50,7 @@ const columns = [
 ];
 
 const page = ref(1);
-const pageCount = 10;
+const pageCount = 8;
 const rows = computed(() => {
   return models.rowItem.slice(
     (page.value - 1) * pageCount,
@@ -114,7 +116,7 @@ const rows = computed(() => {
         </template>
         <UForm
           :state="models"
-          @submit.prevent="updateModels"
+          @submit.prevent="updateModels()"
           class="py-4 flex flex-col gap-4"
         >
           <UFormGroup label="Title" name="title">

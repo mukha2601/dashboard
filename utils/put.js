@@ -189,22 +189,22 @@ function updateCities() {
 
   formData.append(
     "name",
-    formState.name || cities.value.find((p) => p.id === cities.selectedId).name
+    cities.name || cities.value.find((p) => p.id === cities.selectedId).name
   );
   formData.append(
     "text",
-    formState.text || cities.value.find((p) => p.id === cities.selectedId).text
+    cities.text || cities.value.find((p) => p.id === cities.selectedId).text
   );
 
   // Agar yangi rasm tanlangan bo'lsa, uni formData'ga qo'shing, aks holda eski rasmni oling
-  if (formState.images) {
-    formData.append("images", formState.images); // yangi surat
+  if (cities.images) {
+    formData.append("images", cities.images); // yangi surat
   } else {
-    formData.append("image_src", formState.oldImage); // eski suratni yuborish
+    formData.append("image_src", cities.oldImage); // eski suratni yuborish
   }
 
   fetch(
-    `https://autoapi.dezinfeksiyatashkent.uz/api/cities/${selectedId.value}`,
+    `https://autoapi.dezinfeksiyatashkent.uz/api/cities/${cities.selectedId}`,
     {
       method: "PUT",
       body: formData,
@@ -217,26 +217,26 @@ function updateCities() {
       if (!response.ok) {
         throw new Error("Network response was not ok");
       } else {
-        toast.add({
-          title: "Edited",
-          icon: "i-heroicons-check-circle",
-          timeout: 3000,
-        });
+        // toast.add({
+        //   title: "Edited",
+        //   icon: "i-heroicons-check-circle",
+        //   timeout: 3000,
+        // });
       }
       return response.json();
     })
     .then((data) => {
       // Ma'lumotni yangilash
-      const updatedItem = cities.value.find((p) => p.id === selectedId.value);
+      const updatedItem = cities.rowItem.find((p) => p.id === cities.selectedId);
       updatedItem.name = data?.data.name;
       updatedItem.text = data?.data.text;
       updatedItem.image = `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data?.data.image_src}`;
 
       // Formani tozalash
-      formState.name = "";
-      formState.text = "";
-      formState.images = null;
-      formState.oldImage = null;
+      cities.name = "";
+      cities.text = "";
+      cities.images = null;
+      cities.oldImage = null;
     })
     .catch((error) => {
       console.error("Error:", error);

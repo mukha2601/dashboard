@@ -19,7 +19,7 @@ const links = [
   // },
   {
     label: "Settings",
-    icon: "material-symbols:settings",
+    icon: "solar:settings-broken",
     // to: `${
     //   route.path.startsWith("/dev") ? "/dev" : ""
     // }/components/vertical-navigation`,

@@ -122,12 +122,12 @@ export const useCitiesStore = defineStore("cities", {
   },
   actions: {
     openEditModal(row) {
+      this.editModal = true; // Tahrirlash oynasini ochish
       this.name = row.name;
       this.text = row.text;
       this.images = null; // yangi fayl tanlanmagan bo'lsa bo'sh qoldiriladi
       this.oldImage = row.image; // eski suratni saqlaymiz
       this.selectedId = row.id; // Tahrirlanayotgan qatorning ID'sini saqlash
-      this.open = true; // Tahrirlash oynasini ochish
     },
     closeEditModal() {
       this.editModal = false;

@@ -8,9 +8,7 @@ import {
 // --------------------------------------- CATEGORY -----------------------------------------
 function createCategory() {
   const category = useCategoryStore();
-  // Modalni yopish
   category.addModal = false;
-
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
   formData.append("name_en", category.name);
@@ -41,7 +39,6 @@ function createCategory() {
     })
     .then((data) => {
       // Yangi kategoriya qo'shilgandan keyin ma'lumotlar yangilanadi\
-
       category.rowItem.push({
         id: data.data.id,
         name: data.data.name_en,

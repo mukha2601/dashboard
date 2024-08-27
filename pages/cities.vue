@@ -9,10 +9,9 @@ onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/cities")
     .then((response) => response.json())
     .then((items) => {
-      console.log(items);
-
+      cities.rowItem = [];
       items?.data?.map((item) => {
-        cities.value.push({
+        cities.rowItem.push({
           id: item.id,
           name: item.name,
           text: item.text,
@@ -76,14 +75,14 @@ const rows = computed(() => {
         </template>
         <UForm
           :state="cities"
-          @submit.prevent="createCities"
+          @submit.prevent="createCities()"
           class="py-4 flex flex-col gap-4"
         >
           <UFormGroup label="Name" name="name">
-            <UInput v-model="formState.name" required autocomplete="off" />
+            <UInput v-model="cities.name" required autocomplete="off" />
           </UFormGroup>
           <UFormGroup label="Text" name="text">
-            <UInput v-model="formState.text" required autocomplete="off" />
+            <UInput v-model="cities.text" required autocomplete="off" />
           </UFormGroup>
           <UInput
             @input="cities.handleFileChange($event.target.files[0])"
@@ -125,7 +124,7 @@ const rows = computed(() => {
           @submit.prevent="updateCities"
           class="py-4 flex flex-col gap-4"
         >
-          <UFormGroup label="Name" name="name">
+          <UFormGroup v-if="true" label="Name" name="name">
             <UInput v-model="cities.name" required autocomplete="off" />
           </UFormGroup>
           <UFormGroup label="Text" name="text">
@@ -166,7 +165,7 @@ const rows = computed(() => {
       :rows="rows"
       :columns="columns"
       :delete-item="deleteCities"
-      :open-modal="formState.openEditModal"
+      :open-modal="cities.openEditModal"
     />
   </div>
 </template>
