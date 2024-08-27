@@ -20,6 +20,19 @@ onMounted(() => {
     });
 });
 
+const modal = [
+  {
+    key: "name",
+    label: "Name",
+    val: formState.name,
+  },
+  {
+    key: "title",
+    label: "Title",
+    val: formState.title,
+  },
+];
+
 const columns = [
   {
     key: "name",
@@ -52,8 +65,9 @@ const rows = computed(() => {
 
 <template>
   <div>
+    <Modal :modal="modal"/>
     <!-- ------------------------------ Add Modal ------------------------------------ -->
-    <UModal v-model="formState.addModal" prevent-close>
+    <!-- <UModal v-model="formState.addModal" prevent-close>
       <UCard
         :ui="{
           ring: '',
@@ -95,7 +109,7 @@ const rows = computed(() => {
           </div>
         </UForm>
       </UCard>
-    </UModal>
+    </UModal> -->
     <!-- ------------------------------ Add Modal End -------------------------------- -->
 
     <!-- ------------------------------ Edit Modal ----------------------------------- -->

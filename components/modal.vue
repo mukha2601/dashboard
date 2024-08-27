@@ -1,11 +1,6 @@
 <template>
-  <UModal v-model="addModal" prevent-close>
-    <UCard
-      :ui="{
-        ring: '',
-        divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-      }"
-    >
+  <UModal v-model="formState.addModal" prevent-close>
+    <UCard>
       <template #header>
         <div class="flex items-center justify-between">
           Add new items to the database
@@ -14,23 +9,25 @@
             variant="ghost"
             icon="i-heroicons-x-mark-20-solid"
             class="-my-1"
-            @click="addModal = false"
+            @click="formState.addModal = false"
           />
         </div>
       </template>
       <UForm
-        :state="formState"
-        @submit.prevent="create"
+        @submit.prevent="createCategory()"
         class="py-4 flex flex-col gap-4"
       >
-        <UFormGroup label="Name" name="name">
-          <UInput v-model="formState.name" required autocomplete="off" />
-        </UFormGroup>
-        <UFormGroup label="Title" name="title">
-          <UInput v-model="formState.title" required autocomplete="off" />
-        </UFormGroup>
+        <!-- Dynamic form inputs -->
+        <div v-for="(item, index) in modal" :key="item.key">
+          <UFormGroup :label="item.label" :name="item.key">
+            <!-- Bind v-model to the formState's properties -->
+            <UInput v-model="formState[item.key]" required autocomplete="off" />
+          </UFormGroup>
+        </div>
+
+        <!-- File input handling -->
         <UInput
-          @input="handleFileChange($event.target.files[0])"
+          @input="formState.handleFileChange($event.target.files[0])"
           type="file"
           size="sm"
           icon="i-heroicons-folder"
@@ -43,3 +40,17 @@
     </UCard>
   </UModal>
 </template>
+
+<script setup>
+import { useCategoryStore } from "../store/index";
+import { createCategory } from "../utils/post";
+
+const formState = useCategoryStore();
+
+const props = defineProps({
+  modal: {
+    type: Array,
+    required: true,
+  },
+});
+</script>

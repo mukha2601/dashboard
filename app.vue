@@ -42,10 +42,6 @@ onMounted(() => {
 
   if (token?.includes("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey")) {
     // Agar token mavjud bo'lsa, home sahifada qoladi yoki boshqa sahifaga yo'naltiradi
-    if(lastPage === "/brands"){
-      console.log("brandsga kirdi", lastPage);
-      
-    }
     router.push(lastPage);
   } else {
     // Agar token mavjud bo'lmasa, login sahifasiga yo'naltiradi
