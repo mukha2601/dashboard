@@ -110,7 +110,10 @@ export const useModelsStore = defineStore("models", {
 export const useCitiesStore = defineStore("cities", {
   state: () => {
     return {
-      open: false,
+      rowItem: [],
+      addModal: false,
+      editModal: false,
+      selectedId: null,
       name: "",
       text: "",
       images: null, // yangi surat
@@ -119,15 +122,17 @@ export const useCitiesStore = defineStore("cities", {
   },
   actions: {
     openEditModal(row) {
-      this.title = row.title;
+      this.name = row.name;
+      this.text = row.text;
       this.images = null; // yangi fayl tanlanmagan bo'lsa bo'sh qoldiriladi
       this.oldImage = row.image; // eski suratni saqlaymiz
       this.selectedId = row.id; // Tahrirlanayotgan qatorning ID'sini saqlash
-      this.editModal = true; // Tahrirlash oynasini ochish
+      this.open = true; // Tahrirlash oynasini ochish
     },
     closeEditModal() {
       this.editModal = false;
-      this.title = "";
+      this.text = "";
+      this.name = "";
     },
     handleFileChange(event) {
       this.images = event;

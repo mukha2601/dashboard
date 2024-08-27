@@ -214,4 +214,4 @@ function createCities() {
 }
 // --------------------------------------- CITIES END -----------------------------------------
 
-export { createCategory, createBrands, createModel };
+export { createCategory, createBrands, createModel, createCities };

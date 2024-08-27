@@ -1,4 +1,9 @@
-import { useCategoryStore, useBrandsStore,useModelsStore } from "../store/index";
+import {
+  useCategoryStore,
+  useBrandsStore,
+  useModelsStore,
+  useCitiesStore,
+} from "../store/index";
 
 function deleteCategory(row) {
   const category = useCategoryStore();
@@ -93,4 +98,24 @@ function deleteModels(row) {
     });
 }
 
-export { deleteCategory, deleteBrands, deleteModels };
+function deleteCities(row) {
+  const cities = useCitiesStore();
+  const token = localStorage.getItem("accessToken");
+  fetch(`https://autoapi.dezinfeksiyatashkent.uz/api/cities/${row.id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }).then(() => {
+    // toast.add({
+    //   title: "Deleted",
+    //   icon: "material-symbols:delete-outline",
+    //   timeout: 2000,
+    //   color: "red",
+    // });
+    // O'chirilgandan keyin arraydan o'chirish
+    cities.rowItem = cities.rowItem.filter((p) => p.id !== row.id);
+  });
+}
+
+export { deleteCategory, deleteBrands, deleteModels, deleteCities };

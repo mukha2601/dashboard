@@ -243,4 +243,4 @@ function updateCities() {
     });
 }
 
-export { updateCaregory, updateBrands, updateModels };
+export { updateCaregory, updateBrands, updateModels,updateCities };
