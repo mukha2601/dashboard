@@ -8,7 +8,7 @@ import {
 // --------------------------------------- CATEGORY -----------------------------------------
 function createCategory() {
   const category = useCategoryStore();
-  category.addModal = false;
+  category.openModal = false;
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
   formData.append("name_en", category.name);
@@ -61,7 +61,7 @@ function createCategory() {
 // --------------------------------------- BRANDS END -----------------------------------------
 function createBrands() {
   const brands = useBrandsStore();
-  brands.addModal = false; // Modalni yopish
+  brands.openModal = false; // Modalni yopish
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
   formData.append("title", brands.title);
@@ -110,7 +110,7 @@ function createBrands() {
 // --------------------------------------- MODELS -----------------------------------------
 function createModel() {
   const models = useModelsStore();
-  models.addModal = false;
+  models.openModal = false;
   const token = localStorage.getItem("accessToken");
 
   // const formData = new FormData();
@@ -162,7 +162,7 @@ function createModel() {
 // --------------------------------------- CITIES -----------------------------------------
 function createCities() {
   const cities = useCitiesStore();
-  cities.addModal = false; // Modalni yopish
+  cities.openModal = false; // Modalni yopish
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
   formData.append("name", cities.name);

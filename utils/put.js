@@ -2,7 +2,7 @@ import {
   useCategoryStore,
   useBrandsStore,
   useModelsStore,
-  useCitiesStore
+  useCitiesStore,
 } from "../store/index";
 
 function updateCaregory() {
@@ -182,7 +182,7 @@ function updateModels() {
 }
 
 function updateCities() {
-  const cities = useCitiesStore()
+  const cities = useCitiesStore();
   cities.editModal = false; // Modalni yopish
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
@@ -227,7 +227,9 @@ function updateCities() {
     })
     .then((data) => {
       // Ma'lumotni yangilash
-      const updatedItem = cities.rowItem.find((p) => p.id === cities.selectedId);
+      const updatedItem = cities.rowItem.find(
+        (p) => p.id === cities.selectedId
+      );
       updatedItem.name = data?.data.name;
       updatedItem.text = data?.data.text;
       updatedItem.image = `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data?.data.image_src}`;
@@ -243,4 +245,4 @@ function updateCities() {
     });
 }
 
-export { updateCaregory, updateBrands, updateModels,updateCities };
+export { updateCaregory, updateBrands, updateModels, updateCities };

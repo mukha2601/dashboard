@@ -1,5 +1,5 @@
 <template>
-  <UModal v-model="formState.addModal" prevent-close>
+  <UModal v-model="activeState.openModal" prevent-close>
     <UCard>
       <template #header>
         <div class="flex items-center justify-between">
@@ -9,29 +9,34 @@
             variant="ghost"
             icon="i-heroicons-x-mark-20-solid"
             class="-my-1"
-            @click="formState.addModal = false"
+            @click="activeState.closeModal"
           />
         </div>
       </template>
       <UForm
-        @submit.prevent="createCategory()"
+        :state="activeState"
+        @submit.prevent="createORupdate()"
         class="py-4 flex flex-col gap-4"
       >
         <!-- Dynamic form inputs -->
-        <div v-for="(item, index) in modal" :key="item.key">
+        <div v-for="item in modal" :key="item.key">
           <UFormGroup :label="item.label" :name="item.key">
-            <!-- Bind v-model to the formState's properties -->
-            <UInput v-model="formState[item.key]" required autocomplete="off" />
+            <UInput
+              v-model="activeState[item.value]"
+              required
+              autocomplete="off"
+            />
           </UFormGroup>
         </div>
 
         <!-- File input handling -->
         <UInput
-          @input="formState.handleFileChange($event.target.files[0])"
+          @input="activeState.handleFileChange($event.target.files[0])"
           type="file"
           size="sm"
           icon="i-heroicons-folder"
           accept="image/*"
+          :required="isRequired"
         />
         <div>
           <UButton type="submit">Add</UButton>
@@ -42,10 +47,31 @@
 </template>
 
 <script setup>
-import { useCategoryStore } from "../store/index";
-import { createCategory } from "../utils/post";
+import {
+  useCategoryStore,
+  useBrandsStore,
+  useCitiesStore,
+  useModelsStore,
+} from "../store/index";
+import {
+  createCategory,
+  createBrands,
+  createModel,
+  createCities,
+} from "../utils/post";
+import {
+  updateCaregory,
+  updateBrands,
+  updateModels,
+  updateCities,
+} from "../utils/put";
+const route = useRoute();
+const category = useCategoryStore();
+const brands = useBrandsStore();
+const models = useModelsStore();
+const cities = useCitiesStore();
 
-const formState = useCategoryStore();
+const tru = false;
 
 const props = defineProps({
   modal: {
@@ -53,4 +79,33 @@ const props = defineProps({
     required: true,
   },
 });
+
+let activeState = undefined;
+let createORupdate = undefined;
+// Watch for route changes and update activeState dynamically
+watch(
+  () => route.path,
+  (newPath) => {
+    if (newPath === "/") {
+      activeState = category;
+      if (category.isEdit) {
+        createORupdate = updateCaregory;
+      } else {
+        createORupdate = createCategory;
+      }
+    } else if (newPath === "/brands") {
+      activeState = brands;
+      createORupdate = createBrands;
+    } else if (newPath === "/models") {
+      activeState = models;
+      createORupdate = createModel;
+    } else if (newPath === "/cities") {
+      activeState = cities;
+      createORupdate = createCities;
+    }
+  },
+  { immediate: true }
+);
+
+const isRequired = computed(() => activeState.modalRequired);
 </script>

@@ -1,30 +1,34 @@
 // stores/counter.js
 import { defineStore } from "pinia";
 
-export const useCategoryStore = defineStore("formState", {
+export const useCategoryStore = defineStore("category", {
   state: () => {
     return {
       rowItem: [],
-      addModal: false,
-      editModal: false,
+      openModal: false,
       name: "",
       title: "",
       selectedId: null,
       images: null, // yangi surat
       oldImage: null, // eski surat
+      modalRequired: true,
+      isEdit: false,
     };
   },
   actions: {
     openEditModal(row) {
+      this.openModal = true; // Tahrirlash oynasini ochish
       this.name = row.name;
       this.title = row.title;
       this.images = null; // yangi fayl tanlanmagan bo'lsa bo'sh qoldiriladi
       this.oldImage = row.image; // eski suratni saqlaymiz
       this.selectedId = row.id; // Tahrirlanayotgan qatorning ID'sini saqlash
-      this.editModal = true; // Tahrirlash oynasini ochish
+      this.modalRequired = false;
+      this.isEdit = true;
     },
-    closeEditModal() {
-      this.editModal = false;
+    closeModal() {
+      this.openModal = false;
+      this.isEdit = false;
       this.name = "";
       this.title = "";
     },

@@ -50,7 +50,7 @@ const rows = computed(() => {
 <template>
   <div>
     <!-- ------------------------------ Add Modal ------------------------------------ -->
-    <UModal v-model="brands.addModal" prevent-close>
+    <!-- <UModal v-model="brands.addModal" prevent-close>
       <UCard
         :ui="{
           ring: '',
@@ -89,7 +89,7 @@ const rows = computed(() => {
           </div>
         </UForm>
       </UCard>
-    </UModal>
+    </UModal> -->
     <!-- ------------------------------ Add Modal End -------------------------------- -->
 
     <!-- ------------------------------ Edit Modal ----------------------------------- -->
