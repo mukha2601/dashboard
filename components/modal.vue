@@ -29,15 +29,29 @@
           </UFormGroup>
         </div>
 
+        <USelect
+          v-if="inputSelect"
+          placeholder="Brands"
+          :options="
+            models.brands.map((brand) => ({
+              label: brand.title,
+              value: brand.id,
+            }))
+          "
+          v-model="models.brand_id"
+        />
+
         <!-- File input handling -->
         <UInput
+          v-if="inputFile"
           @input="activeState.handleFileChange($event.target.files[0])"
           type="file"
           size="sm"
           icon="i-heroicons-folder"
           accept="image/*"
-          :required="isRequired"
+          :required="!activeState.isEdit"
         />
+
         <div>
           <UButton type="submit">Add</UButton>
         </div>
@@ -70,8 +84,8 @@ const category = useCategoryStore();
 const brands = useBrandsStore();
 const models = useModelsStore();
 const cities = useCitiesStore();
-
-const tru = false;
+const inputSelect = ref(false);
+const inputFile = ref(true);
 
 const props = defineProps({
   modal: {
@@ -83,29 +97,25 @@ const props = defineProps({
 let activeState = undefined;
 let createORupdate = undefined;
 // Watch for route changes and update activeState dynamically
-watch(
-  () => route.path,
-  (newPath) => {
-    if (newPath === "/") {
-      activeState = category;
-      if (category.isEdit) {
-        createORupdate = updateCaregory;
-      } else {
-        createORupdate = createCategory;
-      }
-    } else if (newPath === "/brands") {
-      activeState = brands;
-      createORupdate = createBrands;
-    } else if (newPath === "/models") {
-      activeState = models;
-      createORupdate = createModel;
-    } else if (newPath === "/cities") {
-      activeState = cities;
-      createORupdate = createCities;
-    }
-  },
-  { immediate: true }
-);
-
-const isRequired = computed(() => activeState.modalRequired);
+watchEffect(() => {
+  if (route.path === "/") {
+    activeState = category;
+    inputSelect.value = false;
+    createORupdate = activeState.isEdit ? updateCaregory : createCategory;
+  } else if (route.path === "/brands") {
+    inputSelect.value = false;
+    inputFile.value = true;
+    activeState = brands;
+    createORupdate = activeState.isEdit ? updateBrands : createBrands;
+  } else if (route.path === "/models") {
+    inputSelect.value = true;
+    inputFile.value = false;
+    activeState = models;
+    createORupdate = activeState.isEdit ? updateModels : createModel;
+  } else if (route.path === "/cities") {
+    activeState = cities;
+    inputSelect.value = false;
+    createORupdate = activeState.isEdit ? updateCities : createCities;
+  }
+});
 </script>

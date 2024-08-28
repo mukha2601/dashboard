@@ -3,6 +3,7 @@
     <template #image-data="{ row }">
       <NuxtImg
         width="100"
+        height="50"
         densities="x1"
         :src="row.image"
         alt="Category Image"

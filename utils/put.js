@@ -7,7 +7,7 @@ import {
 
 function updateCaregory() {
   const category = useCategoryStore();
-  category.editModal = false; // Modalni yopish
+  category.openModal = false; // Modalni yopish
   const formData = new FormData();
   const token = localStorage.getItem("accessToken");
   formData.append(
@@ -72,7 +72,7 @@ function updateCaregory() {
 
 function updateBrands() {
   const brands = useBrandsStore();
-  brands.editModal = false; // Modalni yopish
+  brands.openModal = false; // Modalni yopish
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
 
@@ -130,7 +130,7 @@ function updateBrands() {
 
 function updateModels() {
   const models = useModelsStore();
-  models.editModal = false;
+  models.openModal = false;
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
 
@@ -183,7 +183,7 @@ function updateModels() {
 
 function updateCities() {
   const cities = useCitiesStore();
-  cities.editModal = false; // Modalni yopish
+  cities.openModal = false; // Modalni yopish
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
 

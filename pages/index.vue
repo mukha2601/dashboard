@@ -3,7 +3,6 @@ import { useCategoryStore } from "../store";
 import { createCategory } from "../utils/post";
 import { updateCaregory } from "../utils/put";
 import { deleteCategory } from "../utils/delete";
-const toast = useToast();
 const category = useCategoryStore();
 
 // sahifa ishga tushishidan oldin ishlaydigan funksiya
@@ -65,9 +64,7 @@ const rows = computed(() => {
 
 <template>
   <div>
-    <div
-      class="flex justify-end px-3 py-3.5  sticky top-0 bg-[#191A19] z-10"
-    >
+    <div class="flex justify-end px-3 py-3.5 sticky top-0 bg-[#191A19] z-10">
       <UButton
         label="Add categories"
         class="me-4"

@@ -34,6 +34,14 @@ onMounted(() => {
     });
 });
 
+const modal = [
+  {
+    key: "name",
+    label: "Name",
+    value: "name",
+  },
+];
+
 const columns = [
   {
     key: "name",
@@ -60,114 +68,23 @@ const rows = computed(() => {
 </script>
 
 <template>
-  <div>
-    <UModal v-model="models.addModal" prevent-close>
-      <UCard>
-        <template #header>
-          <div class="flex items-center justify-between">
-            Add new items to the database
-            <UButton
-              color="gray"
-              variant="ghost"
-              icon="i-heroicons-x-mark-20-solid"
-              class="-my-1"
-              @click="models.addModal = false"
-            />
-          </div>
-        </template>
-        <UForm
-          :state="models"
-          @submit.prevent="createModel"
-          class="py-4 flex flex-col gap-4"
-        >
-          <UFormGroup label="Name" name="name">
-            <UInput v-model="models.name" required autocomplete="off" />
-          </UFormGroup>
-          <USelect
-            placeholder="Brands"
-            :options="
-              models.brands.map((brand) => ({
-                label: brand.title,
-                value: brand.id,
-              }))
-            "
-            v-model="models.brand_id"
-          />
-          <div>
-            <UButton type="submit">Add</UButton>
-          </div>
-        </UForm>
-      </UCard>
-    </UModal>
-
-    <UModal v-model="models.editModal" prevent-close>
-      <UCard>
-        <template #header>
-          <div class="flex items-center justify-between">
-            Edit Category
-            <UButton
-              color="gray"
-              variant="ghost"
-              icon="i-heroicons-x-mark-20-solid"
-              class="-my-1"
-              @click="models.editModal = false"
-            />
-          </div>
-        </template>
-        <UForm
-          :state="models"
-          @submit.prevent="updateModels()"
-          class="py-4 flex flex-col gap-4"
-        >
-          <UFormGroup label="Title" name="title">
-            <UInput v-model="models.name" autocomplete="off" />
-          </UFormGroup>
-          <USelect
-            placeholder="Brands"
-            :options="
-              models.brands.map((brand) => ({
-                label: brand.title,
-                value: brand.id,
-              }))
-            "
-            v-model="models.brand_id"
-          />
-          <div>
-            <UButton type="submit">Update</UButton>
-          </div>
-        </UForm>
-      </UCard>
-    </UModal>
-
-    <div
-      class="flex justify-end px-3 py-3.5 dark:border-gray-700 sticky top-0 bg-[#191A19] z-10"
-    >
-      <UButton label="Add Model" class="me-4" @click="models.addModal = true" />
-      <UPagination
-        v-model="page"
-        :page-count="pageCount"
-        :total="models.rowItem.length"
-      />
-    </div>
-
-    <!-- <UTable :rows="rows" :columns="columns">
-      <template #actions-data="{ row }">
-        <UDropdown :items="items(row)">
-          <UButton
-            color="gray"
-            variant="ghost"
-            icon="i-heroicons-ellipsis-horizontal-20-solid"
-          />
-        </UDropdown>
-      </template>
-    </UTable> -->
-
-    <!-- -------------------------------- Table -------------------------------------- -->
-    <Table
-      :rows="rows"
-      :columns="columns"
-      :delete-item="deleteModels"
-      :open-modal="models.openEditModal"
+  <div
+    class="flex justify-end px-3 py-3.5 dark:border-gray-700 sticky top-0 bg-[#191A19] z-10"
+  >
+    <UButton label="Add Model" class="me-4" @click="models.openModal = true" />
+    <UPagination
+      v-model="page"
+      :page-count="pageCount"
+      :total="models.rowItem.length"
     />
   </div>
+
+  <Modal :modal="modal" />
+  <!-- -------------------------------- Table -------------------------------------- -->
+  <Table
+    :rows="rows"
+    :columns="columns"
+    :delete-item="deleteModels"
+    :open-modal="models.openEditModal"
+  />
 </template>

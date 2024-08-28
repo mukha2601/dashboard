@@ -11,7 +11,6 @@ export const useCategoryStore = defineStore("category", {
       selectedId: null,
       images: null, // yangi surat
       oldImage: null, // eski surat
-      modalRequired: true,
       isEdit: false,
     };
   },
@@ -23,14 +22,15 @@ export const useCategoryStore = defineStore("category", {
       this.images = null; // yangi fayl tanlanmagan bo'lsa bo'sh qoldiriladi
       this.oldImage = row.image; // eski suratni saqlaymiz
       this.selectedId = row.id; // Tahrirlanayotgan qatorning ID'sini saqlash
-      this.modalRequired = false;
       this.isEdit = true;
     },
     closeModal() {
       this.openModal = false;
-      this.isEdit = false;
       this.name = "";
       this.title = "";
+      this.oldImage = null; // eski suratni saqlaymiz
+      this.selectedId = null; // Tahrirlanayotgan qatorning ID'sini saqlash
+      this.isEdit = false;
     },
     handleFileChange(event) {
       this.images = event;
@@ -42,25 +42,29 @@ export const useBrandsStore = defineStore("brands", {
   state: () => {
     return {
       rowItem: [],
-      addModal: false,
-      editModal: false,
+      openModal: false,
       selectedId: null,
       title: "",
       images: null, // yangi surat
       oldImage: null, // eski surat
+      isEdit: false,
     };
   },
   actions: {
     openEditModal(row) {
+      this.openModal = true; // Tahrirlash oynasini ochish
       this.title = row.title;
       this.images = null; // yangi fayl tanlanmagan bo'lsa bo'sh qoldiriladi
       this.oldImage = row.image; // eski suratni saqlaymiz
       this.selectedId = row.id; // Tahrirlanayotgan qatorning ID'sini saqlash
-      this.editModal = true; // Tahrirlash oynasini ochish
+      this.isEdit = true;
     },
-    closeEditModal() {
-      this.editModal = false;
+    closeModal() {
+      this.openModal = false;
       this.title = "";
+      this.oldImage = null; // eski suratni saqlaymiz
+      this.selectedId = null; // Tahrirlanayotgan qatorning ID'sini saqlash
+      this.isEdit = false;
     },
     handleFileChange(event) {
       this.images = event;
@@ -72,8 +76,8 @@ export const useModelsStore = defineStore("models", {
   state: () => {
     return {
       rowItem: [],
-      addModal: false,
-      editModal: false,
+      openModal: false,
+      isEdit: false,
       selectedId: null,
       selectedItem: null,
       brands: [],
@@ -85,6 +89,7 @@ export const useModelsStore = defineStore("models", {
     openEditModal(row) {
       // Hozirgi qatorning id sini yangilash
       this.selectedId = row.id;
+      
 
       // Hozirgi qatorning elementini olish
       this.selectedItem = this.rowItem.find((p) => p.id === this.selectedId);
@@ -98,10 +103,14 @@ export const useModelsStore = defineStore("models", {
         console.error("Qator elementi topilmadi");
       }
 
-      this.editModal = true;
+      this.openModal = true;
+      this.isEdit = true;
     },
-    closeEditModal() {
-      this.editModal = false;
+    closeModal() {
+      this.selectedItem = null
+      this.selectedId = null;
+      this.openModal = false;
+      this.isEdit = false;
       this.name = "";
       this.brand_id = "";
     },
@@ -115,8 +124,8 @@ export const useCitiesStore = defineStore("cities", {
   state: () => {
     return {
       rowItem: [],
-      addModal: false,
-      editModal: false,
+      openModal: false,
+      isEdit: false,
       selectedId: null,
       name: "",
       text: "",
@@ -126,15 +135,19 @@ export const useCitiesStore = defineStore("cities", {
   },
   actions: {
     openEditModal(row) {
-      this.editModal = true; // Tahrirlash oynasini ochish
+      this.openModal = true; // Tahrirlash oynasini ochish
       this.name = row.name;
       this.text = row.text;
       this.images = null; // yangi fayl tanlanmagan bo'lsa bo'sh qoldiriladi
       this.oldImage = row.image; // eski suratni saqlaymiz
       this.selectedId = row.id; // Tahrirlanayotgan qatorning ID'sini saqlash
+      this.isEdit = true;
     },
-    closeEditModal() {
-      this.editModal = false;
+    closeModal() {
+      this.openModal = false;
+      this.isEdit = false;
+      this.oldImage = null; // eski suratni saqlaymiz
+      this.selectedId = null; // Tahrirlanayotgan qatorning ID'sini saqlash
       this.text = "";
       this.name = "";
     },
