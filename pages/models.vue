@@ -58,7 +58,7 @@ const columns = [
 ];
 
 const page = ref(1);
-const pageCount = 8;
+const pageCount = 7;
 const rows = computed(() => {
   return models.rowItem.slice(
     (page.value - 1) * pageCount,

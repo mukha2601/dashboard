@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full bg-[#191A19] h-[10vh] flex justify-end p-4 rounded-md">
+  <div class="w-full bg-[#191A19] h-[10vh] flex justify-end p-4 px-6 rounded-md">
     <UDropdown :items="items" :popper="{ placement: 'bottom-start' }">
       <UButton
         color="white"
@@ -7,10 +7,11 @@
         trailing-icon="i-heroicons-chevron-down-20-solid"
       >
         <template #leading>
-          <UAvatar
+          <UIcon name="material-symbols:account-circle-outline" class="w-5 h-5" />
+          <!-- <UAvatar
             src="https://avatars.githubusercontent.com/u/739984?v=4"
             size="2xs"
-          />
+          /> -->
         </template>
       </UButton>
     </UDropdown>

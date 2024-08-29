@@ -118,4 +118,24 @@ function deleteCities(row) {
   });
 }
 
-export { deleteCategory, deleteBrands, deleteModels, deleteCities };
+function deleteCars(row) {
+  const cars = useCitiesStore();
+  const token = localStorage.getItem("accessToken");
+  fetch(`https://autoapi.dezinfeksiyatashkent.uz/api/cars/${row.id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }).then(() => {
+    // toast.add({
+    //   title: "Deleted",
+    //   icon: "material-symbols:delete-outline",
+    //   timeout: 2000,
+    //   color: "red",
+    // });
+    // O'chirilgandan keyin arraydan o'chirish
+    cars.rowItem = cars.rowItem.filter((p) => p.id !== row.id);
+  });
+}
+
+export { deleteCategory, deleteBrands, deleteModels, deleteCities, deleteCars };

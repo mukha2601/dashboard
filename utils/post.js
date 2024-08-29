@@ -211,4 +211,57 @@ function createCities() {
 }
 // --------------------------------------- CITIES END -----------------------------------------
 
-export { createCategory, createBrands, createModel, createCities };
+// --------------------------------------- CARS -----------------------------------------
+function createCars() {
+  const cars = useCategoryStore();
+  cars.openModal = false;
+  const token = localStorage.getItem("accessToken");
+  const formData = new FormData();
+  formData.append("name_en", cars.name);
+  formData.append("name_ru", cars.title);
+
+  if (cars.images) {
+    formData.append("images", cars.images);
+  }
+
+  fetch("https://autoapi.dezinfeksiyatashkent.uz/api/categories", {
+    method: "POST",
+    body: formData,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      } else {
+        // toast.add({
+        //   title: response.statusText,
+        //   icon: "i-heroicons-check-circle",
+        //   timeout: 3000,
+        // });
+      }
+      return response.json();
+    })
+    .then((data) => {
+      // Yangi kategoriya qo'shilgandan keyin ma'lumotlar yangilanadi\
+      cars.rowItem.push({
+        id: data.data.id,
+        name: data.data.name_en,
+        title: data.data.name_ru,
+        image: `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data.data.image_src}`,
+      });
+
+      // Formani tozalash
+
+      cars.name = "";
+      cars.title = "";
+      cars.images = null;
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+// --------------------------------------- CARS END -----------------------------------------
+
+export { createCategory, createBrands, createModel, createCities,createCars };

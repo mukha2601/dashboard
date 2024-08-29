@@ -245,4 +245,56 @@ function updateCities() {
     });
 }
 
-export { updateCaregory, updateBrands, updateModels, updateCities };
+function updateCars() {
+  const cars = useModelsStore();
+  cars.openModal = false;
+  const token = localStorage.getItem("accessToken");
+  const formData = new FormData();
+
+  // selectedItem.value = rowItem.value.find((p) => p.id === selectedId.value);
+  formData.append("name", cars.name || cars.selectedItem.name);
+  formData.append(
+    "brand_id",
+    cars.brand_id ||
+      cars.brands.find((b) => b.title === cars.selectedItem?.brand)?.id
+  );
+
+  fetch(
+    `https://autoapi.dezinfeksiyatashkent.uz/api/cars/${cars.selectedId}`,
+    {
+      method: "PUT",
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      } else {
+        // toast.add({
+        //   title: "Edited",
+        //   icon: "i-heroicons-check-circle",
+        //   timeout: 3000,
+        // });
+      }
+      return response.json();
+    })
+    .then((data) => {
+      const updatedItem = cars.rowItem.find(
+        (p) => p.id === cars.selectedId
+      );
+      updatedItem.name = data?.data.name;
+      updatedItem.brand =
+        cars.brands.find((b) => b.id === data.data.brand_id)?.title ||
+        updatedItem.brand;
+
+      cars.name = "";
+      cars.brand_id = "";
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+export { updateCaregory, updateBrands, updateModels, updateCities, updateCars };
