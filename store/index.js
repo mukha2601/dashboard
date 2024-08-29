@@ -162,8 +162,8 @@ export const useCarsStore = defineStore("cars", {
       category_id: "",
       brand_id: "",
       model_id: "",
-      city_id: "",
       location_id: "",
+      city_id: "",
       rowItem: [],
       category: [],
       brands: [],
@@ -193,6 +193,7 @@ export const useCarsStore = defineStore("cars", {
       cover: null, // cover image
       oldImage: null, // eski surat
       selectedId: null,
+      selectedItem: null,
       isEdit: false,
     };
   },
@@ -217,6 +218,19 @@ export const useCarsStore = defineStore("cars", {
       this.price_in_aed_sale = row.price_in_aed_sale;
       this.price_in_usd_sale = row.price_in_usd_sale;
       this.isEdit = true;
+      this.selectedId = row.id;
+      this.selectedItem = this.rowItem.find((p) => p.id === this.selectedId);
+      this.category_id =
+        this.category.find((b) => b.name === this.selectedItem.category.name_en)?.id ||
+        "";
+      this.brand_id =
+        this.brands.find((b) => b.title === this.selectedItem.brand)?.id || "";
+      this.model_id =
+        this.models.find((b) => b.name === this.selectedItem.models.name)?.id || "";
+      this.location_id =
+        this.locations.find((b) => b.name === this.selectedItem.location.name)?.id || "";
+      this.city_id =
+        this.cities.find((b) => b.name === this.selectedItem.cities.name)?.id || "";
     },
     closeModal() {
       this.openModal = false;

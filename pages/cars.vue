@@ -13,9 +13,13 @@ onMounted(() => {
       cars.rowItem = items?.data?.map((item) => ({
         id: item.id,
         brand: item.brand.title,
+        category: item.category,
+        city: item.city.name,
+        models: item.model,
+        location: item.location,
         model: item.model.name,
         color: item.color,
-        city: item.city.name,
+        cities: item.city,
         car_images: item.car_images,
         deposit: item.deposit,
         drive_side: item.drive_side,
@@ -51,11 +55,13 @@ onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/models")
     .then((response) => response.json())
     .then((items) => {
+      console.log(items);
+      
       cars.models = [];
       items?.data?.map((item) => {
         cars.models.push({
           id: item.id,
-          brand: item.brand_title, // To'g'ri brendni olish
+          name: item.name, // To'g'ri brendni olish
         });
       });
     });

@@ -50,7 +50,7 @@
               placeholder="Select Model"
               :options="
                 cars.models.map((item) => ({
-                  label: item.brand,
+                  label: item.name,
                   value: item.id,
                 }))
               "
@@ -96,7 +96,7 @@
           </UFormGroup>
         </div>
 
-        <div v-if="false">
+        <div v-if="true">
           <USelect
             v-if="inputSelect"
             placeholder="Brands"
