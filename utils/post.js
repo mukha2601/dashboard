@@ -3,7 +3,7 @@ import {
   useBrandsStore,
   useModelsStore,
   useCitiesStore,
-  useCarsStore
+  useCarsStore,
 } from "../store/index";
 
 // --------------------------------------- CATEGORY -----------------------------------------
@@ -271,29 +271,31 @@ function createCars() {
       cars.rowItem.push({
         id: item.data.id,
         brand: cars.brands.find((b) => b.id === item.data.brand_id)?.title,
-        category: cars.category.find((b) => b.id === item.data.name)?.name,
-        city: item.data.city?.name || "Unknown City",
-        model: item.data.model || "Unknown Model",
-        location: item.data.location || "Unknown Location",
-        color: item.data.color || "Unknown Color",
-        car_images: item.data.car_images || [],
-        deposit: item.data.deposit || "N/A",
-        drive_side: item.data.drive_side || "N/A",
-        limitperday: item.data.limitperday || "N/A",
-        max_people: item.data.max_people || "N/A",
-        max_speed: item.data.max_speed || "N/A",
-        motor: item.data.motor || "N/A",
-        petrol: item.data.petrol || "N/A",
-        premium_protection: item.data.premium_protection || "N/A",
-        price_in_aed: item.data.price_in_aed || "N/A",
-        price_in_aed_sale: item.data.price_in_aed_sale || "N/A",
-        price_in_usd: item.data.price_in_usd || "N/A",
-        price_in_usd_sale: item.data.price_in_usd_sale || "N/A",
-        seconds: item.data.seconds || "N/A",
-        three_days_price: item.data.three_days_price || "N/A",
-        transmission: item.data.transmission || "N/A",
-        two_days_price: item.data.two_days_price || "N/A",
-        year: item.data.year || "N/A",
+        category: cars.category.find((b) => b.id === item.data.category_id)
+          ?.name,
+        city: cars.cities.find((b) => b.id === item.data.city_id)?.name,
+        model: cars.models.find((b) => b.id === item.data.model_id)?.name,
+        location: cars.locations.find((b) => b.id === item.data.location_id)
+          ?.name,
+        color: item.data.color,
+        car_images: item.data.car_images,
+        deposit: item.data.deposit,
+        drive_side: item.data.drive_side,
+        limitperday: item.data.limitperday,
+        max_people: item.data.max_people,
+        max_speed: item.data.max_speed,
+        motor: item.data.motor,
+        petrol: item.data.petrol,
+        premium_protection: item.data.premium_protection,
+        price_in_aed: item.data.price_in_aed,
+        price_in_aed_sale: item.data.price_in_aed_sale,
+        price_in_usd: item.data.price_in_usd,
+        price_in_usd_sale: item.data.price_in_usd_sale,
+        seconds: item.data.seconds,
+        three_days_price: item.data.three_days_price,
+        transmission: item.data.transmission,
+        two_days_price: item.data.two_days_price,
+        year: item.data.year,
         image: item.data.image_src
           ? `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${item.data.image_src}`
           : "default-image.jpg", // Fallback image

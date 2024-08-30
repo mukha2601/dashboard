@@ -7,15 +7,14 @@ onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/cars")
     .then((response) => response.json())
     .then((items) => {
-      console.log(items);
+      console.log(items, "cars");
 
       cars.rowItem = items?.data?.map((item) => ({
         id: item.id,
         brand: item.brand.title,
         category: item.category,
         city: item.city.name,
-        models: item.model,
-        location: item.location,
+        location: item.location.name,
         model: item.model.name,
         color: item.color,
         cities: item.city.id,
@@ -47,6 +46,8 @@ onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/categories")
     .then((response) => response.json())
     .then((items) => {
+      console.log(items, "category");
+
       cars.category = [];
       cars.category = items?.data?.map((item) => ({
         id: item.id,
@@ -57,6 +58,7 @@ onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/models")
     .then((response) => response.json())
     .then((items) => {
+      console.log(items, "models");
       cars.models = [];
       items?.data?.map((item) => {
         cars.models.push({
@@ -69,6 +71,7 @@ onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/brands")
     .then((response) => response.json())
     .then((data) => {
+      console.log(data, "brands");
       if (data?.data) {
         cars.brands = [];
         data.data.map((el) => {
@@ -83,6 +86,7 @@ onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/locations")
     .then((response) => response.json())
     .then((data) => {
+      console.log(data, "location");
       if (data?.data) {
         cars.locations = [];
         data.data.map((el) => {
@@ -97,6 +101,7 @@ onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/cities")
     .then((response) => response.json())
     .then((items) => {
+      console.log(items, "cities");
       cars.cities = [];
       items?.data?.map((item) => {
         cars.cities.push({
@@ -207,6 +212,11 @@ const columns = [
     key: "city",
     label: "City",
   },
+  {
+    key: "location",
+    label: "Location",
+  },
+
   {
     key: "actions",
     label: "Actions",
