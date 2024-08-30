@@ -3,6 +3,7 @@ import {
   useBrandsStore,
   useModelsStore,
   useCitiesStore,
+  useCarsStore
 } from "../store/index";
 
 // --------------------------------------- CATEGORY -----------------------------------------
@@ -213,18 +214,44 @@ function createCities() {
 
 // --------------------------------------- CARS -----------------------------------------
 function createCars() {
-  const cars = useCategoryStore();
+  const cars = useCarsStore();
   cars.openModal = false;
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
-  formData.append("name_en", cars.name);
-  formData.append("name_ru", cars.title);
+  formData.append("category_id", cars.category_id);
+  formData.append("brand_id", cars.brand_id);
+  formData.append("model_id", cars.model_id);
+  formData.append("location_id", cars.location_id);
+  formData.append("city_id", cars.city_id);
+  formData.append("color", cars.color);
+  formData.append("year", cars.year);
+  formData.append("seconds", cars.seconds);
+  formData.append("max_speed", cars.max_speed);
+  formData.append("max_people", cars.max_people);
+  formData.append("transmission", cars.transmission);
+  formData.append("motor", cars.motor);
+  formData.append("drive_side", cars.drive_side);
+  formData.append("petrol", cars.petrol);
+  formData.append("limitperday", cars.limitperday);
+  formData.append("deposit", cars.deposit);
+  formData.append("premium_protection", cars.premium_protection);
+  formData.append("price_in_aed", cars.price_in_aed);
+  formData.append("price_in_usd", cars.price_in_usd);
+  formData.append("price_in_aed_sale", cars.price_in_aed_sale);
+  formData.append("price_in_usd_sale", cars.price_in_usd_sale);
+  formData.append("inclusive", cars.inclusive);
 
   if (cars.images) {
     formData.append("images", cars.images);
   }
+  if (cars.imagesMain) {
+    formData.append("imagesMain", cars.imagesMain);
+  }
+  if (cars.cover) {
+    formData.append("cover", cars.cover);
+  }
 
-  fetch("https://autoapi.dezinfeksiyatashkent.uz/api/categories", {
+  fetch("https://autoapi.dezinfeksiyatashkent.uz/api/cars", {
     method: "POST",
     body: formData,
     headers: {
@@ -234,34 +261,52 @@ function createCars() {
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
-      } else {
-        // toast.add({
-        //   title: response.statusText,
-        //   icon: "i-heroicons-check-circle",
-        //   timeout: 3000,
-        // });
       }
       return response.json();
     })
-    .then((data) => {
-      // Yangi kategoriya qo'shilgandan keyin ma'lumotlar yangilanadi\
+    .then((item) => {
+      console.log(item);
+
+      // Safeguard against missing properties
       cars.rowItem.push({
-        id: data.data.id,
-        name: data.data.name_en,
-        title: data.data.name_ru,
-        image: `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${data.data.image_src}`,
+        id: item.data.id,
+        brand: cars.brands.find((b) => b.id === item.data.brand_id)?.title,
+        category: cars.category.find((b) => b.id === item.data.name)?.name,
+        city: item.data.city?.name || "Unknown City",
+        model: item.data.model || "Unknown Model",
+        location: item.data.location || "Unknown Location",
+        color: item.data.color || "Unknown Color",
+        car_images: item.data.car_images || [],
+        deposit: item.data.deposit || "N/A",
+        drive_side: item.data.drive_side || "N/A",
+        limitperday: item.data.limitperday || "N/A",
+        max_people: item.data.max_people || "N/A",
+        max_speed: item.data.max_speed || "N/A",
+        motor: item.data.motor || "N/A",
+        petrol: item.data.petrol || "N/A",
+        premium_protection: item.data.premium_protection || "N/A",
+        price_in_aed: item.data.price_in_aed || "N/A",
+        price_in_aed_sale: item.data.price_in_aed_sale || "N/A",
+        price_in_usd: item.data.price_in_usd || "N/A",
+        price_in_usd_sale: item.data.price_in_usd_sale || "N/A",
+        seconds: item.data.seconds || "N/A",
+        three_days_price: item.data.three_days_price || "N/A",
+        transmission: item.data.transmission || "N/A",
+        two_days_price: item.data.two_days_price || "N/A",
+        year: item.data.year || "N/A",
+        image: item.data.image_src
+          ? `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${item.data.image_src}`
+          : "default-image.jpg", // Fallback image
       });
 
-      // Formani tozalash
-
-      cars.name = "";
-      cars.title = "";
-      cars.images = null;
+      // Clear form values
+      // cars.clearForm(); // Assuming you have a clearForm method
     })
     .catch((error) => {
       console.error("Error:", error);
     });
 }
+
 // --------------------------------------- CARS END -----------------------------------------
 
-export { createCategory, createBrands, createModel, createCities,createCars };
+export { createCategory, createBrands, createModel, createCities, createCars };

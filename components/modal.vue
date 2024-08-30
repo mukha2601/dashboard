@@ -18,7 +18,7 @@
         @submit.prevent="createORupdate()"
         class="py-4 flex flex-col gap-4"
       >
-        <div v-if="true" class="flex flex-col gap-4">
+        <!-- <div v-if="true" class="flex flex-col gap-4">
           <UFormGroup label="Category" name="category">
             <USelect
               placeholder="Select Category"
@@ -83,10 +83,10 @@
               v-model="cars.city_id"
             />
           </UFormGroup>
-        </div>
+        </div> -->
 
         <!-- Dynamic form inputs -->
-        <div v-for="item in modal" :key="item.key" v-if="true">
+        <div v-for="item in modal" :key="item.key">
           <UFormGroup :label="item.label" :name="item.key">
             <UInput
               v-model="activeState[item.value]"
@@ -96,30 +96,28 @@
           </UFormGroup>
         </div>
 
-        <div v-if="true">
-          <USelect
-            v-if="inputSelect"
-            placeholder="Brands"
-            :options="
-              models.brands.map((brand) => ({
-                label: brand.title,
-                value: brand.id,
-              }))
-            "
-            v-model="models.brand_id"
-          />
+        <USelect
+          v-if="inputSelect"
+          placeholder="Brands"
+          :options="
+            models.brands.map((brand) => ({
+              label: brand.title,
+              value: brand.id,
+            }))
+          "
+          v-model="models.brand_id"
+        />
 
-          <!-- File input handling -->
-          <UInput
-            v-if="inputFile"
-            @input="activeState.handleFileChange($event.target.files[0])"
-            type="file"
-            size="sm"
-            icon="i-heroicons-folder"
-            accept="image/*"
-            :required="!activeState.isEdit"
-          />
-        </div>
+        <!-- File input handling -->
+        <UInput
+          v-if="inputFile"
+          @input="activeState.handleFileChange($event.target.files[0])"
+          type="file"
+          size="sm"
+          icon="i-heroicons-folder"
+          accept="image/*"
+          :required="!activeState.isEdit"
+        />
 
         <div>
           <UButton type="submit">Add</UButton>

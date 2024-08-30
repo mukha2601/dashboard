@@ -187,9 +187,9 @@ export const useCarsStore = defineStore("cars", {
       price_in_usd: "",
       price_in_aed_sale: "",
       price_in_usd_sale: "",
-      inclusive: null,
+      inclusive: false,
       images: null, // car images
-      images: null, // main image
+      imagesMain: null, // main image
       cover: null, // cover image
       oldImage: null, // eski surat
       selectedId: null,
@@ -217,20 +217,24 @@ export const useCarsStore = defineStore("cars", {
       this.price_in_usd = row.price_in_usd;
       this.price_in_aed_sale = row.price_in_aed_sale;
       this.price_in_usd_sale = row.price_in_usd_sale;
+      this.inclusive = false;
       this.isEdit = true;
       this.selectedId = row.id;
       this.selectedItem = this.rowItem.find((p) => p.id === this.selectedId);
       this.category_id =
-        this.category.find((b) => b.name === this.selectedItem.category.name_en)?.id ||
-        "";
+        this.category.find((b) => b.name === this.selectedItem.category.name_en)
+          ?.id || "";
       this.brand_id =
         this.brands.find((b) => b.title === this.selectedItem.brand)?.id || "";
       this.model_id =
-        this.models.find((b) => b.name === this.selectedItem.models.name)?.id || "";
+        this.models.find((b) => b.name === this.selectedItem.models.name)?.id ||
+        "";
       this.location_id =
-        this.locations.find((b) => b.name === this.selectedItem.location.name)?.id || "";
+        this.locations.find((b) => b.name === this.selectedItem.location.name)
+          ?.id || "";
       this.city_id =
-        this.cities.find((b) => b.name === this.selectedItem.cities.name)?.id || "";
+        this.cities.find((b) => b.name === this.selectedItem.cities.name)?.id ||
+        "";
     },
     closeModal() {
       this.openModal = false;
@@ -242,6 +246,12 @@ export const useCarsStore = defineStore("cars", {
     },
     handleFileChange(event) {
       this.images = event;
+    },
+    handleFileChangeMain(event) {
+      this.imagesMain = event;
+    },
+    handleFileChangeCover(event) {
+      this.cover = event;
     },
   },
 });

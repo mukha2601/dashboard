@@ -20,7 +20,6 @@
 </template>
 
 <script setup>
-import { useCategoryStore } from "../store";
 const props = defineProps({
   rows: {
     type: Array,
@@ -39,6 +38,4 @@ const props = defineProps({
     required: true,
   },
 });
-
-const formState = useCategoryStore();
 </script>

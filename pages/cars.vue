@@ -3,7 +3,6 @@ import { useCarsStore } from "../store";
 import { deleteCars } from "../utils/delete";
 const cars = useCarsStore();
 
-// sahifa ishga tushishidan oldin ishlaydigan funksiya
 onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/cars")
     .then((response) => response.json())
@@ -19,7 +18,7 @@ onMounted(() => {
         location: item.location,
         model: item.model.name,
         color: item.color,
-        cities: item.city,
+        cities: item.city.id,
         car_images: item.car_images,
         deposit: item.deposit,
         drive_side: item.drive_side,
@@ -41,7 +40,10 @@ onMounted(() => {
         image: `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${item.image_src}`,
       }));
     });
+});
 
+// sahifa ishga tushishidan oldin ishlaydigan funksiya
+onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/categories")
     .then((response) => response.json())
     .then((items) => {
@@ -55,8 +57,6 @@ onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/models")
     .then((response) => response.json())
     .then((items) => {
-      console.log(items);
-      
       cars.models = [];
       items?.data?.map((item) => {
         cars.models.push({
@@ -127,11 +127,6 @@ const modal = [
     key: "max_speed",
     label: "Max speed",
     value: "max_speed",
-  },
-  {
-    key: "seconds",
-    label: "Seconds",
-    value: "seconds",
   },
   {
     key: "max_people",
@@ -231,6 +226,130 @@ const rows = computed(() => {
 
 <template>
   <div>
+    <UModal v-model="cars.openModal" prevent-close>
+      <UCard>
+        <template #header>
+          <div class="flex items-center justify-between">
+            Add new items to the database
+            <UButton
+              color="gray"
+              variant="ghost"
+              icon="i-heroicons-x-mark-20-solid"
+              class="-my-1"
+              @click="cars.closeModal"
+            />
+          </div>
+        </template>
+        <UForm
+          :state="cars"
+          @submit.prevent="createCars()"
+          class="py-4 flex flex-col gap-4"
+        >
+          <div class="flex flex-col gap-4">
+            <UFormGroup label="Category" name="category">
+              <USelect
+                placeholder="Select Category"
+                :options="
+                  cars.category.map((item) => ({
+                    label: item.name,
+                    value: item.id,
+                  }))
+                "
+                v-model="cars.category_id"
+              />
+            </UFormGroup>
+
+            <UFormGroup label="Brand" name="brand">
+              <USelect
+                placeholder="Select Brand"
+                :options="
+                  cars.brands.map((item) => ({
+                    label: item.title,
+                    value: item.id,
+                  }))
+                "
+                v-model="cars.brand_id"
+              />
+            </UFormGroup>
+
+            <UFormGroup label="Model" name="model">
+              <USelect
+                placeholder="Select Model"
+                :options="
+                  cars.models.map((item) => ({
+                    label: item.name,
+                    value: item.id,
+                  }))
+                "
+                v-model="cars.model_id"
+              />
+            </UFormGroup>
+
+            <UFormGroup label="Location" name="location">
+              <USelect
+                placeholder="Select Location"
+                :options="
+                  cars.locations.map((item) => ({
+                    label: item.name,
+                    value: item.id,
+                  }))
+                "
+                v-model="cars.location_id"
+              />
+            </UFormGroup>
+
+            <UFormGroup label="City" name="city">
+              <USelect
+                placeholder="Select City"
+                :options="
+                  cars.cities.map((item) => ({
+                    label: item.name,
+                    value: item.id,
+                  }))
+                "
+                v-model="cars.city_id"
+              />
+            </UFormGroup>
+          </div>
+
+          <!-- Dynamic form inputs -->
+          <div v-for="item in modal" :key="item.key">
+            <UFormGroup :label="item.label" :name="item.key">
+              <UInput v-model="cars[item.value]" required autocomplete="off" />
+            </UFormGroup>
+          </div>
+
+          <UInput
+            @input="cars.handleFileChange($event.target.files[0])"
+            type="file"
+            size="sm"
+            icon="i-heroicons-folder"
+            accept="image/*"
+          />
+
+          <UInput
+            @input="cars.handleFileChangeMain($event.target.files[0])"
+            type="file"
+            size="sm"
+            icon="i-heroicons-folder"
+            accept="image/*"
+          />
+
+          <UInput
+            @input="cars.handleFileChangeCover($event.target.files[0])"
+            type="file"
+            size="sm"
+            icon="i-heroicons-folder"
+            accept="image/*"
+          />
+
+          <div>
+            <UButton type="submit">Add</UButton>
+          </div>
+        </UForm>
+      </UCard>
+    </UModal>
+
     <div class="flex justify-end px-3 py-3.5 sticky top-0 bg-[#191A19] z-10">
       <UButton
         label="Add categories"
@@ -244,7 +363,6 @@ const rows = computed(() => {
       />
     </div>
 
-    <Modal :modal="modal" />
     <Table
       :rows="rows"
       :columns="columns"
