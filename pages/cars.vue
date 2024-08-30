@@ -12,7 +12,7 @@ onMounted(() => {
       cars.rowItem = items?.data?.map((item) => ({
         id: item.id,
         brand: item.brand.title,
-        category: item.category,
+        category: item.category.name_en,
         city: item.city.name,
         location: item.location.name,
         model: item.model.name,
@@ -252,7 +252,7 @@ const rows = computed(() => {
         </template>
         <UForm
           :state="cars"
-          @submit.prevent="createCars()"
+          @submit.prevent="cars.isEdit == true ? updateCars() : createCars()"
           class="py-4 flex flex-col gap-4"
         >
           <div class="flex flex-col gap-4">
@@ -353,19 +353,18 @@ const rows = computed(() => {
             accept="image/*"
           />
 
-          <div>
+          <div v-if="!cars.isEdit">
             <UButton type="submit">Add</UButton>
+          </div>
+          <div v-if="cars.isEdit">
+            <UButton type="submit">Edit</UButton>
           </div>
         </UForm>
       </UCard>
     </UModal>
 
     <div class="flex justify-end px-3 py-3.5 sticky top-0 bg-[#191A19] z-10">
-      <UButton
-        label="Add categories"
-        class="me-4"
-        @click="cars.openModal = true"
-      />
+      <UButton label="Add Cars" class="me-4" @click="cars.openModal = true" />
       <UPagination
         v-model="page"
         :page-count="pageCount"

@@ -222,26 +222,49 @@ export const useCarsStore = defineStore("cars", {
       this.selectedId = row.id;
       this.selectedItem = this.rowItem.find((p) => p.id === this.selectedId);
       this.category_id =
-        this.category.find((b) => b.name === this.selectedItem.category.name_en)
-          ?.id || "";
+        this.category.find((b) => b.name === this.selectedItem.category)?.id ||
+        "";
       this.brand_id =
         this.brands.find((b) => b.title === this.selectedItem.brand)?.id || "";
       this.model_id =
-        this.models.find((b) => b.name === this.selectedItem.models.name)?.id ||
-        "";
+        this.models.find((b) => b.name === this.selectedItem.model)?.id || "";
       this.location_id =
-        this.locations.find((b) => b.name === this.selectedItem.location.name)
-          ?.id || "";
-      this.city_id =
-        this.cities.find((b) => b.name === this.selectedItem.cities.name)?.id ||
+        this.locations.find((b) => b.name === this.selectedItem.location)?.id ||
         "";
+      this.city_id = this.cities.find(
+        (b) => b.name === this.selectedItem.city
+      )?.id;
     },
     closeModal() {
-      this.openModal = false;
+      this.category_id = "";
+      this.brand_id = "";
+      this.model_id = "";
+      this.location_id = "";
+      this.city_id = "";
       this.color = "";
-      this.title = "";
-      this.oldImage = null; // eski suratni saqlaymiz
-      this.selectedId = null; // Tahrirlanayotgan qatorning ID'sini saqlash
+      this.year = "";
+      this.seconds = "";
+      this.max_speed = "";
+      this.max_people = "";
+      this.transmission = "";
+      this.motor = "";
+      this.drive_side = "";
+      this.petrol = "";
+      this.limitperday = "";
+      this.deposit = "";
+      this.premium_protection = "";
+      this.price_in_aed = "";
+      this.price_in_usd = "";
+      this.price_in_aed_sale = "";
+      this.price_in_usd_sale = "";
+      this.inclusive = false;
+      this.images = null; // car images
+      this.imagesMain = null; // main image
+      this.cover = null; // cover image
+      this.openModal = false;
+      this.oldImage = null; // eski surat
+      this.selectedId = null;
+      this.selectedItem = null;
       this.isEdit = false;
     },
     handleFileChange(event) {

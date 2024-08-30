@@ -3,6 +3,7 @@ import {
   useBrandsStore,
   useModelsStore,
   useCitiesStore,
+  useCarsStore
 } from "../store/index";
 
 function updateCaregory() {
@@ -246,55 +247,104 @@ function updateCities() {
 }
 
 function updateCars() {
-  const cars = useModelsStore();
+  const cars = useCarsStore();
   cars.openModal = false;
   const token = localStorage.getItem("accessToken");
   const formData = new FormData();
+  formData.append("category_id", cars.category_id);
+  formData.append("brand_id", cars.brand_id);
+  formData.append("model_id", cars.model_id);
+  formData.append("location_id", cars.location_id);
+  formData.append("city_id", cars.city_id);
+  formData.append("color", cars.color);
+  formData.append("year", cars.year);
+  formData.append("seconds", cars.seconds);
+  formData.append("max_speed", cars.max_speed);
+  formData.append("max_people", cars.max_people);
+  formData.append("transmission", cars.transmission);
+  formData.append("motor", cars.motor);
+  formData.append("drive_side", cars.drive_side);
+  formData.append("petrol", cars.petrol);
+  formData.append("limitperday", cars.limitperday);
+  formData.append("deposit", cars.deposit);
+  formData.append("premium_protection", cars.premium_protection);
+  formData.append("price_in_aed", cars.price_in_aed);
+  formData.append("price_in_usd", cars.price_in_usd);
+  formData.append("price_in_aed_sale", cars.price_in_aed_sale);
+  formData.append("price_in_usd_sale", cars.price_in_usd_sale);
+  formData.append("inclusive", cars.inclusive);
 
-  // selectedItem.value = rowItem.value.find((p) => p.id === selectedId.value);
-  formData.append("name", cars.name || cars.selectedItem.name);
-  formData.append(
-    "brand_id",
-    cars.brand_id ||
-      cars.brands.find((b) => b.title === cars.selectedItem?.brand)?.id
-  );
+  if (cars.images) {
+    formData.append("images", cars.images);
+  }
+  if (cars.imagesMain) {
+    formData.append("imagesMain", cars.imagesMain);
+  }
+  if (cars.cover) {
+    formData.append("cover", cars.cover);
+  }
 
-  fetch(
-    `https://autoapi.dezinfeksiyatashkent.uz/api/cars/${cars.selectedId}`,
-    {
-      method: "PUT",
-      body: formData,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  )
+  fetch(`https://autoapi.dezinfeksiyatashkent.uz/api/cars/${cars.selectedId}`, {
+    method: "PUT",
+    body: formData,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
-      } else {
-        // toast.add({
-        //   title: "Edited",
-        //   icon: "i-heroicons-check-circle",
-        //   timeout: 3000,
-        // });
       }
       return response.json();
     })
-    .then((data) => {
-      const updatedItem = cars.rowItem.find(
-        (p) => p.id === cars.selectedId
-      );
-      updatedItem.name = data?.data.name;
-      updatedItem.brand =
-        cars.brands.find((b) => b.id === data.data.brand_id)?.title ||
-        updatedItem.brand;
+    .then((item) => {
+      console.log(item);
 
-      cars.name = "";
-      cars.brand_id = "";
+      // Find the item to update
+      const index = cars.rowItem.findIndex((p) => p.id === cars.selectedId);
+
+      if (index !== -1) {
+        // Update the item with the new data
+        cars.rowItem[index] = {
+          id: item.data.id,
+          brand: cars.brands.find((b) => b.id === item.data.brand_id)?.title,
+          category: cars.category.find((b) => b.id === item.data.category_id)
+            ?.name,
+          city: cars.cities.find((b) => b.id === item.data.city_id)?.name,
+          model: cars.models.find((b) => b.id === item.data.model_id)?.name,
+          location: cars.locations.find((b) => b.id === item.data.location_id)
+            ?.name,
+          color: item.data.color,
+          car_images: item.data.car_images,
+          deposit: item.data.deposit,
+          drive_side: item.data.drive_side,
+          limitperday: item.data.limitperday,
+          max_people: item.data.max_people,
+          max_speed: item.data.max_speed,
+          motor: item.data.motor,
+          petrol: item.data.petrol,
+          premium_protection: item.data.premium_protection,
+          price_in_aed: item.data.price_in_aed,
+          price_in_aed_sale: item.data.price_in_aed_sale,
+          price_in_usd: item.data.price_in_usd,
+          price_in_usd_sale: item.data.price_in_usd_sale,
+          seconds: item.data.seconds,
+          three_days_price: item.data.three_days_price,
+          transmission: item.data.transmission,
+          two_days_price: item.data.two_days_price,
+          year: item.data.year,
+          image: item.data.image_src
+            ? `https://autoapi.dezinfeksiyatashkent.uz/api/uploads/images/${item.data.image_src}`
+            : "default-image.jpg", // Fallback image
+        };
+      }
+
+      // Clear form values
+      cars.closeModal(); // Assuming you have a clearForm method
     })
     .catch((error) => {
       console.error("Error:", error);
     });
 }
+
 export { updateCaregory, updateBrands, updateModels, updateCities, updateCars };

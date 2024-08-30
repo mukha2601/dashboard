@@ -1,11 +1,9 @@
 <script setup>
 import { useCategoryStore } from "../store";
-import { createCategory } from "../utils/post";
-import { updateCaregory } from "../utils/put";
 import { deleteCategory } from "../utils/delete";
 const category = useCategoryStore();
 
-// sahifa ishga tushishidan oldin ishlaydigan funksiya
+// sahifa ishga tushganda bir marta ishlaydigan va rowItem ozgarsa ishlaydigan funksiya
 onMounted(() => {
   fetch("https://autoapi.dezinfeksiyatashkent.uz/api/categories")
     .then((response) => response.json())
