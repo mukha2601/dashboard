@@ -45,7 +45,7 @@ useSeoMeta({
   ogTitle: "My Dashboard",
   ogDescription:
     "Bu sayt uchun admin panel hisoblanadi va websahyt uchun ma'lumotlar shu yerdan qoshiladi",
-  ogImage: "/logo.ico",
+  ogImage: "https://dashboard-six-alpha-33.vercel.app/logo.ico",
   ogUrl: "https://dashboard-six-alpha-33.vercel.app/",
   ogType: "website",
 });
