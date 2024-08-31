@@ -18,73 +18,6 @@
         @submit.prevent="createORupdate()"
         class="py-4 flex flex-col gap-4"
       >
-        <!-- <div v-if="true" class="flex flex-col gap-4">
-          <UFormGroup label="Category" name="category">
-            <USelect
-              placeholder="Select Category"
-              :options="
-                cars.category.map((item) => ({
-                  label: item.name,
-                  value: item.id,
-                }))
-              "
-              v-model="cars.category_id"
-            />
-          </UFormGroup>
-
-          <UFormGroup label="Brand" name="brand">
-            <USelect
-              placeholder="Select Brand"
-              :options="
-                cars.brands.map((item) => ({
-                  label: item.title,
-                  value: item.id,
-                }))
-              "
-              v-model="cars.brand_id"
-            />
-          </UFormGroup>
-
-          <UFormGroup label="Model" name="model">
-            <USelect
-              placeholder="Select Model"
-              :options="
-                cars.models.map((item) => ({
-                  label: item.name,
-                  value: item.id,
-                }))
-              "
-              v-model="cars.model_id"
-            />
-          </UFormGroup>
-
-          <UFormGroup label="Location" name="location">
-            <USelect
-              placeholder="Select Location"
-              :options="
-                cars.locations.map((item) => ({
-                  label: item.name,
-                  value: item.id,
-                }))
-              "
-              v-model="cars.location_id"
-            />
-          </UFormGroup>
-
-          <UFormGroup label="City" name="city">
-            <USelect
-              placeholder="Select City"
-              :options="
-                cars.cities.map((item) => ({
-                  label: item.name,
-                  value: item.id,
-                }))
-              "
-              v-model="cars.city_id"
-            />
-          </UFormGroup>
-        </div> -->
-
         <!-- Dynamic form inputs -->
         <div v-for="item in modal" :key="item.key">
           <UFormGroup :label="item.label" :name="item.key">
@@ -119,8 +52,11 @@
           :required="!activeState.isEdit"
         />
 
-        <div>
+        <div v-if="!activeState.isEdit">
           <UButton type="submit">Add</UButton>
+        </div>
+        <div v-if="activeState.isEdit">
+          <UButton type="submit">Edit</UButton>
         </div>
       </UForm>
     </UCard>
@@ -133,28 +69,24 @@ import {
   useBrandsStore,
   useCitiesStore,
   useModelsStore,
-  useCarsStore,
 } from "../store/index";
 import {
   createCategory,
   createBrands,
   createModel,
   createCities,
-  createCars,
 } from "../utils/post";
 import {
   updateCaregory,
   updateBrands,
   updateModels,
   updateCities,
-  updateCars,
 } from "../utils/put";
 const route = useRoute();
 const category = useCategoryStore();
 const brands = useBrandsStore();
 const models = useModelsStore();
 const cities = useCitiesStore();
-const cars = useCarsStore();
 const inputSelect = ref(false);
 const inputFile = ref(true);
 
@@ -186,9 +118,6 @@ watchEffect(() => {
   } else if (route.path === "/cities") {
     activeState = cities;
     inputSelect.value = false;
-    createORupdate = activeState.isEdit ? updateCities : createCities;
-  } else if (route.path === "/cars") {
-    activeState = cars;
     createORupdate = activeState.isEdit ? updateCities : createCities;
   }
 });
