@@ -29,6 +29,14 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 const route = useRoute();
 
+useSeoMeta({
+  title: "DASH",
+  ogTitle: "My dashboard",
+  description:
+    "Bu sayt uchun admin panel hisoblanadi va websayt uchun ma'lumotlar shu yerdan qoshiladi",
+  ogImage: "/logo.png",
+});
+
 watch(
   () => route.fullPath,
   (newPath) => {
