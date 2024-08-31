@@ -4,7 +4,7 @@
       class="logo flex gap-4 items-center justify-start bg-[#292b29] w-full p-2 rounded-md"
     >
       <NuxtLink to="/">
-        <NuxtImg src="../public/logo.png" width="35" />
+        <NuxtImg src="/logo.png" width="35" />
       </NuxtLink>
       <p>Dashboard</p>
     </div>
