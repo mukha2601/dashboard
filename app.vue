@@ -28,14 +28,24 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 const route = useRoute();
 
+useHead({
+  title: "Dashboard",
+  meta: [
+    { charset: "utf-8" },
+    { name: "viewport", content: "width=device-width, initial-scale=1" },
+    {
+      content:
+        "Bu sayt uchun admin panel hisoblanadi va websahyt uchun ma'lumotlar shu yerdan qoshiladi",
+    },
+  ],
+  link: [{ rel: "icon", type: "image/x-icon", href: "/logo.ico" }],
+});
+
 useSeoMeta({
-  title: "My Dashboard",
-  description:
-    "Bu sayt uchun admin panel hisoblanadi va websahyt uchun ma'lumotlar shu yerdan qoshiladi",
   ogTitle: "My Dashboard",
   ogDescription:
     "Bu sayt uchun admin panel hisoblanadi va websahyt uchun ma'lumotlar shu yerdan qoshiladi",
-  ogImage: "/logo.ico", // public papkasidagi logo.ico fayli
+  ogImage: "/logo.ico",
   ogUrl: "https://dashboard-six-alpha-33.vercel.app/",
   ogType: "website",
 });
