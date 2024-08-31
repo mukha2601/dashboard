@@ -24,17 +24,20 @@ body {
 </style>
 
 <script setup>
-import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
 const route = useRoute();
 
 useSeoMeta({
-  title: "DASH",
-  ogTitle: "My dashboard",
+  title: "My Dashboard",
   description:
-    "Bu sayt uchun admin panel hisoblanadi va websayt uchun ma'lumotlar shu yerdan qoshiladi",
-  ogImage: "/logo.png",
+    "Bu sayt uchun admin panel hisoblanadi va websahyt uchun ma'lumotlar shu yerdan qoshiladi",
+  ogTitle: "My Dashboard",
+  ogDescription:
+    "Bu sayt uchun admin panel hisoblanadi va websahyt uchun ma'lumotlar shu yerdan qoshiladi",
+  ogImage: "/logo.ico", // public papkasidagi logo.ico fayli
+  ogUrl: "https://dashboard-six-alpha-33.vercel.app/",
+  ogType: "website",
 });
 
 watch(
