@@ -5,9 +5,9 @@ import {
   useCitiesStore,
   useCarsStore,
 } from "../store/index";
-import { useToast } from "vue-toastification";
-import "vue-toastification/dist/index.css";
-const toast = useToast();
+// import { useToast } from "vue-toastification";
+// import "vue-toastification/dist/index.css";
+// const toast = useToast();
 
 // --------------------------------------- CATEGORY -----------------------------------------
 function createCategory() {
@@ -40,10 +40,10 @@ function createCategory() {
         // });
 
         // toast funksiyasini komponentda ishlatish
-        toast.success("Muvaffaqiyatli saqlandi!", {
-          icon: "i-heroicons-check-circle",
-          timeout: 3000,
-        });
+        // toast.success("Muvaffaqiyatli saqlandi!", {
+        //   icon: "i-heroicons-check-circle",
+        //   timeout: 3000,
+        // });
       }
       return response.json();
     })

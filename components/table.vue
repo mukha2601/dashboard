@@ -15,22 +15,21 @@
         <UButton label="Edit" color="gray" @click="openModal(row)" />
         <UPopover overlay>
           <UButton
-            color="white"
+            color="red"
             label="Delete"
-            trailing-icon="i-heroicons-chevron-down-20-solid"
+            variant="outline"
           />
 
           <template #panel="{ close }">
-            <div class="p-4 flex flex-col gap-4">
-              <div class="flex gap-3">
+            <div class="p-4 flex flex-col gap-3">
+              <div class="flex gap-2">
                 <UIcon
                   name="ph:warning-circle-bold"
-                  color="yellow"
                   class="w-5 h-5"
                 />
-                <p>Do you want to delete this brand?</p>
+                <p>Do you want to delete this?</p>
               </div>
-              <div class="flex gap-4">
+              <div class="flex gap-3">
                 <UButton
                   label="OK"
                   color="primary"

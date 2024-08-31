@@ -57,7 +57,7 @@ function onSubmit() {
 </script>
 
 <template>
-  <div class="p-8  rounded-md bg-[#191A19]">
+  <div class="p-8  rounded-md bg-[#191A19] w-[300px]">
     <UForm :state="state" class="space-y-4" @submit.prevent="onSubmit()">
       <UFormGroup label="Phone" name="phone">
         <UInput v-model="state.phone" type="text" required minlength="3" />
